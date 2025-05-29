@@ -26,11 +26,11 @@ class StudentRegistrationScreen extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(24, 20, 24, 40),
               child: Column(
                 children: [
-                  Text('Student Registration', style: AppTextStyles.hint),
+                  Text('Student Registration', style: AppTextStyles.welcomeTitle),
                   SizedBox(height: 8),
                   Text(
                     'Join our academic community',
-                    style: AppTextStyles.subtitle,
+                    style: AppTextStyles.welcomeTitle,
                   ),
                 ],
               ),

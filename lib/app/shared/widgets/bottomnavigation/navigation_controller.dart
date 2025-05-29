@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 
 class BottomNavController extends GetxController {
-  var currentIndex = 0.obs;
+  var selectedIndex = 0.obs;
 
-  void changeTab(int index) {
-    currentIndex.value = index;
+  void changeBottomNavIndex(int index) {
+    selectedIndex.value = index;
   }
 }

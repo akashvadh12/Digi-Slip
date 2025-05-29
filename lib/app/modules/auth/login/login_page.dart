@@ -3,6 +3,8 @@
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/core/theme/app_text_styles.dart';
 import 'package:digislips/app/modules/auth/controllers/auth_controller.dart';
+import 'package:digislips/app/modules/dashboard/dashboard.dart';
+import 'package:digislips/app/shared/widgets/bottomnavigation/bottomnavigation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -20,7 +22,7 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: 60),
-                
+
                 // Logo Container
                 Container(
                   width: 80,
@@ -35,25 +37,22 @@ class LoginScreen extends StatelessWidget {
                     size: 40,
                   ),
                 ),
-                
+
                 SizedBox(height: 24),
-                
+
                 // DigiSlips Brand
-                Text(
-                  'DigiSlips',
-                  style: AppTextStyles.brandName,
-                ),
-                
+                Text('DigiSlips', style: AppTextStyles.brandName),
+
                 SizedBox(height: 8),
-                
+
                 // Subtitle
                 Text(
                   'Your Digital School Companion',
                   style: AppTextStyles.subtitle,
                 ),
-                
+
                 SizedBox(height: 50),
-                
+
                 // Email Field
                 _buildInputField(
                   label: 'Email Address',
@@ -61,14 +60,14 @@ class LoginScreen extends StatelessWidget {
                   hintText: 'Enter your email',
                   keyboardType: TextInputType.emailAddress,
                 ),
-                
+
                 SizedBox(height: 24),
-                
+
                 // Password Field
                 _buildPasswordField(),
-                
+
                 SizedBox(height: 16),
-                
+
                 // Forgot Password Link
                 Align(
                   alignment: Alignment.centerRight,
@@ -80,53 +79,50 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 SizedBox(height: 30),
-                
+
                 // Login Button
-                Obx(() => Container(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: controller.isLoading.value 
-                        ? null 
-                        : controller.login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                Obx(
+                  () => Container(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.to(BottomNavBarWidget());
+                        controller.isLoading.value ? null : controller.login;
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
                       ),
-                      elevation: 0,
+                      child: controller.isLoading.value
+                          ? SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text('Log In', style: AppTextStyles.buttonText),
                     ),
-                    child: controller.isLoading.value
-                        ? SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : Text(
-                            'Log In',
-                            style: AppTextStyles.buttonText,
-                          ),
                   ),
-                )),
-                
+                ),
+
                 SizedBox(height: 32),
-                
+
                 // Sign Up Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "Don't have an account? ",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textGrey,
-                      ),
+                      style: TextStyle(fontSize: 14, color: AppColors.textGrey),
                     ),
                     TextButton(
                       onPressed: controller.navigateToSignUp,
@@ -135,16 +131,13 @@ class LoginScreen extends StatelessWidget {
                         minimumSize: Size(0, 0),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      child: Text(
-                        'Sign Up',
-                        style: AppTextStyles.linkText,
-                      ),
+                      child: Text('Sign Up', style: AppTextStyles.linkText),
                     ),
                   ],
                 ),
-                
+
                 SizedBox(height: 60),
-                
+
                 // Bottom Indicator
                 Container(
                   width: 134,
@@ -154,7 +147,7 @@ class LoginScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(2.5),
                   ),
                 ),
-                
+
                 SizedBox(height: 20),
               ],
             ),
@@ -173,10 +166,7 @@ class LoginScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTextStyles.label,
-        ),
+        Text(label, style: AppTextStyles.label),
         SizedBox(height: 8),
         Container(
           width: double.infinity,
@@ -199,24 +189,15 @@ class LoginScreen extends StatelessWidget {
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.lightGrey,
-                  width: 1,
-                ),
+                borderSide: BorderSide(color: AppColors.lightGrey, width: 1),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.lightGrey,
-                  width: 1,
-                ),
+                borderSide: BorderSide(color: AppColors.lightGrey, width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.primary,
-                  width: 2,
-                ),
+                borderSide: BorderSide(color: AppColors.primary, width: 2),
               ),
             ),
           ),
@@ -229,64 +210,54 @@ class LoginScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Password',
-          style: AppTextStyles.label,
-        ),
+        Text('Password', style: AppTextStyles.label),
         SizedBox(height: 8),
-        Obx(() => Container(
-          width: double.infinity,
-          child: TextField(
-            controller: controller.passwordController,
-            obscureText: !controller.isPasswordVisible.value,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black,
-              fontWeight: FontWeight.w400,
-            ),
-            decoration: InputDecoration(
-              hintText: 'Enter your password',
-              hintStyle: AppTextStyles.hint,
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
+        Obx(
+          () => Container(
+            width: double.infinity,
+            child: TextField(
+              controller: controller.passwordController,
+              obscureText: !controller.isPasswordVisible.value,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.w400,
               ),
-              suffixIcon: IconButton(
-                onPressed: controller.togglePasswordVisibility,
-                icon: Icon(
-                  controller.isPasswordVisible.value
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  color: AppColors.greyColor,
-                  size: 20,
+              decoration: InputDecoration(
+                hintText: 'Enter your password',
+                hintStyle: AppTextStyles.hint,
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
                 ),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.lightGrey,
-                  width: 1,
+                suffixIcon: IconButton(
+                  onPressed: controller.togglePasswordVisibility,
+                  icon: Icon(
+                    controller.isPasswordVisible.value
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    color: AppColors.greyColor,
+                    size: 20,
+                  ),
                 ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.lightGrey,
-                  width: 1,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.lightGrey, width: 1),
                 ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.primary,
-                  width: 2,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.lightGrey, width: 1),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primary, width: 2),
                 ),
               ),
             ),
           ),
-        )),
+        ),
       ],
     );
   }

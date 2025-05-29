@@ -1,5 +1,6 @@
 // app/modules/apply_leave/controllers/apply_leave_controller.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:digislips/app/modules/auth/login/login_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -9,12 +10,12 @@ import 'dart:io';
 class ApplyLeaveController extends GetxController {
   // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   // final FirebaseStorage _storage = FirebaseStorage.instance;
-  
+
   // Form Controllers
   final TextEditingController reasonController = TextEditingController();
   final TextEditingController destinationController = TextEditingController();
   final TextEditingController travelModeController = TextEditingController();
-  
+
   // Observable Variables
   var selectedLeaveType = 'Sick Leave'.obs;
   var fromDate = Rxn<DateTime>();
@@ -22,12 +23,12 @@ class ApplyLeaveController extends GetxController {
   var isLoading = false.obs;
   var uploadedFiles = <File>[].obs;
   var uploadedFileNames = <String>[].obs;
-  
+
   // Leave Types
   final List<String> leaveTypes = [
     'Sick Leave',
     'Personal Leave',
-    'Academic Leave'
+    'Academic Leave',
   ];
 
   @override
@@ -133,10 +134,11 @@ class ApplyLeaveController extends GetxController {
 
   Future<List<String>> uploadFilesToFirebase() async {
     List<String> downloadUrls = [];
-    
+
     for (int i = 0; i < uploadedFiles.length; i++) {
       try {
-        String fileName = 'leave_documents/${DateTime.now().millisecondsSinceEpoch}_${uploadedFileNames[i]}';
+        String fileName =
+            'leave_documents/${DateTime.now().millisecondsSinceEpoch}_${uploadedFileNames[i]}';
         // UploadTask uploadTask = _storage.ref().child(fileName).putFile(uploadedFiles[i]);
         // TaskSnapshot snapshot = await uploadTask;
         // String downloadUrl = await snapshot.ref.getDownloadURL();
@@ -145,11 +147,12 @@ class ApplyLeaveController extends GetxController {
         print('Error uploading file ${uploadedFileNames[i]}: $e');
       }
     }
-    
+
     return downloadUrls;
   }
 
   Future<void> submitApplication() async {
+    Get.to(LoginScreen());
     // Validation
     if (fromDate.value == null || toDate.value == null) {
       Get.snackbar(
@@ -175,13 +178,13 @@ class ApplyLeaveController extends GetxController {
 
     try {
       isLoading.value = true;
-      
+
       // Upload files to Firebase Storage
       List<String> documentUrls = await uploadFilesToFirebase();
-      
+
       // Calculate total days
       int totalDays = toDate.value!.difference(fromDate.value!).inDays + 1;
-      
+
       // Create leave application document
       Map<String, dynamic> leaveData = {
         'leaveType': selectedLeaveType.value,
@@ -196,10 +199,10 @@ class ApplyLeaveController extends GetxController {
         'submittedAt': Timestamp.now(),
         'submittedBy': 'user_id_here', // Replace with actual user ID
       };
-      
+
       // // Submit to Firestore
       // await _firestore.collection('leave_applications').add(leaveData);
-      
+
       Get.snackbar(
         'Success',
         'Leave application submitted successfully!',
@@ -207,13 +210,12 @@ class ApplyLeaveController extends GetxController {
         backgroundColor: const Color(0xFF4CAF50),
         colorText: Colors.white,
       );
-      
+
       // Clear form
       clearForm();
-      
+
       // Navigate back
       Get.back();
-      
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -243,4 +245,3 @@ class ApplyLeaveController extends GetxController {
     return '${date.day}/${date.month}/${date.year}';
   }
 }
-
