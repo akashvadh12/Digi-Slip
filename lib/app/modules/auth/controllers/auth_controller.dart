@@ -1,160 +1,131 @@
-
-// login_controller.dart
-
 import 'package:digislips/app/core/theme/app_colors.dart';
+import 'package:digislips/app/modules/auth/StudentRegistration/StudentRegistration.dart';
+import 'package:digislips/app/shared/widgets/bottomnavigation/bottomnavigation.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginController extends GetxController {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  
-  var isLoading = false.obs;
-  var isPasswordVisible = false.obs;
-  
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  final formKey = GlobalKey<FormState>();
+  final isLoading = false.obs;
+  final isPasswordVisible = false.obs;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Toggle password visibility
   void togglePasswordVisibility() {
-    isPasswordVisible.value = !isPasswordVisible.value;
+    isPasswordVisible.toggle();
   }
 
-  // Validation
+  // Email validation
   String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Email is required';
     }
-    if (!GetUtils.isEmail(value)) {
+    if (!GetUtils.isEmail(value.trim())) {
       return 'Enter a valid email address';
     }
     return null;
   }
 
+  // Password validation
   String? validatePassword(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Password is required';
     }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+    if (value.trim().length < 6) {
+      return 'Password must be at least 6 characters long';
     }
     return null;
   }
 
-  // Login function
+  // Login method with form validation
   Future<void> login() async {
-    if (!_validateForm()) return;
+    if (!formKey.currentState!.validate()) {
+      _showSnackbar('Validation Error', 'Please correct the errors in the form');
+      return;
+    }
 
+    isLoading(true);
     try {
-      isLoading(true);
-      
-      // UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-      //   email: emailController.text.trim(),
-      //   password: passwordController.text.trim(),
-      // );
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
 
-      Get.snackbar(
-        'Success',
-        'Login successful!',
-        backgroundColor: AppColors.greenColor,
-        colorText: Colors.white,
-      );
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+
+      _showSnackbar('Success', 'Login successful!', isSuccess: true);
 
       // Navigate to dashboard
-      // Get.offAll(() => DashboardScreen());
-      
+      Get.offAll(() => BottomNavBarWidget());
+
     } on FirebaseAuthException catch (e) {
-      String errorMessage = 'Login failed';
-      
-      switch (e.code) {
-        case 'user-not-found':
-          errorMessage = 'No user found with this email';
-          break;
-        case 'wrong-password':
-          errorMessage = 'Wrong password provided';
-          break;
-        case 'invalid-email':
-          errorMessage = 'Invalid email address';
-          break;
-        case 'user-disabled':
-          errorMessage = 'This account has been disabled';
-          break;
-        case 'too-many-requests':
-          errorMessage = 'Too many attempts. Try again later';
-          break;
-        default:
-          errorMessage = e.message ?? 'Login failed';
-      }
-      
-      Get.snackbar(
-        'Error',
-        errorMessage,
-        backgroundColor: AppColors.error,
-        colorText: Colors.white,
-      );
+      _handleFirebaseError(e);
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'An unexpected error occurred',
-        backgroundColor: AppColors.error,
-        colorText: Colors.white,
-      );
+      _showSnackbar('Error', 'Unexpected error: ${e.toString()}');
     } finally {
       isLoading(false);
     }
   }
 
-  // Forgot password
+  // Forgot password logic
   Future<void> forgotPassword() async {
-    if (emailController.text.trim().isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please enter your email address first',
-        backgroundColor: AppColors.error,
-        colorText: Colors.white,
-      );
+    final email = emailController.text.trim();
+
+    if (email.isEmpty) {
+      _showSnackbar('Error', 'Please enter your email address first');
+      return;
+    }
+
+    if (!GetUtils.isEmail(email)) {
+      _showSnackbar('Error', 'Enter a valid email address');
       return;
     }
 
     try {
-      // await _auth.sendPasswordResetEmail(email: emailController.text.trim());
-      Get.snackbar(
-        'Success',
-        'Password reset email sent!',
-        backgroundColor: AppColors.greenColor,
-        colorText: Colors.white,
-      );
+      await _auth.sendPasswordResetEmail(email: email);
+      _showSnackbar('Success', 'Password reset email sent!', isSuccess: true);
+    } on FirebaseAuthException catch (e) {
+      _handleFirebaseError(e);
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to send reset email',
-        backgroundColor: AppColors.error,
-        colorText: Colors.white,
-      );
+      _showSnackbar('Error', 'Unexpected error: ${e.toString()}');
     }
   }
 
-  // Navigate to sign up
+  // Navigate to registration screen
   void navigateToSignUp() {
-    // Navigate to registration screen
-    Get.snackbar('Info', 'Navigate to Sign Up screen');
-    // Get.to(() => StudentRegistrationScreen());
+    Get.to(() => StudentRegistrationScreen());
   }
 
-  bool _validateForm() {
-    final emailError = validateEmail(emailController.text);
-    final passwordError = validatePassword(passwordController.text);
+  // Error display helper
+  void _showSnackbar(String title, String message, {bool isSuccess = false}) {
+    Get.snackbar(
+      title,
+      message,
+      backgroundColor: isSuccess ? AppColors.greenColor : AppColors.error,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 3),
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.all(12),
+    );
+  }
 
-    if (emailError != null || passwordError != null) {
-      Get.snackbar(
-        'Validation Error',
-        emailError ?? passwordError ?? 'Please check your inputs',
-        backgroundColor: AppColors.error,
-        colorText: Colors.white,
-      );
-      return false;
-    }
-    return true;
+  // FirebaseAuth error mapping
+  void _handleFirebaseError(FirebaseAuthException e) {
+    final Map<String, String> errorMessages = {
+      'user-not-found': 'No user found with this email.',
+      'wrong-password': 'Incorrect password. Try again.',
+      'invalid-email': 'Invalid email address.',
+      'user-disabled': 'This account has been disabled.',
+      'too-many-requests': 'Too many attempts. Try again later.',
+      'network-request-failed': 'Network error. Check your connection.',
+    };
+
+    final errorMessage = errorMessages[e.code] ?? (e.message ?? 'Login failed. Try again.');
+
+    _showSnackbar('Error', errorMessage);
   }
 
   @override

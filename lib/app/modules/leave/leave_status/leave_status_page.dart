@@ -548,27 +548,29 @@ class LeaveRequestsScreen extends StatelessWidget {
                                 );
                                 if (date != null) startDate.value = date;
                               },
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: AppColors.borderColor,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: AppColors.lightGrey,
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.calendar_today, size: 16),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      startDate.value?.toString().split(
-                                            ' ',
-                                          )[0] ??
-                                          'Select',
-                                      style: AppTextStyles.body,
+                              child: Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: AppColors.borderColor,
                                     ),
-                                  ],
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: AppColors.lightGrey,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.calendar_today, size: 16),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        startDate.value?.toString().split(
+                                              ' ',
+                                            )[0] ??
+                                            'Select',
+                                        style: AppTextStyles.body,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

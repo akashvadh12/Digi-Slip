@@ -17,7 +17,7 @@ import 'package:get/get.dart';
 
 // Define your route names in a class for easy reuse
 class AppPages {
-  static const INITIAL = Routes.BOTTOM_NAVIGATION;
+  static const INITIAL = Routes.STUDENT_REGISTRATION;
 
   static final routes = [
     GetPage(
