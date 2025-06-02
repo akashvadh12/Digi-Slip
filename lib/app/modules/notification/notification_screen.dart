@@ -1,5 +1,3 @@
-
-
 // notifications_screen.dart
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/core/theme/app_text_styles.dart';
@@ -23,13 +21,17 @@ class NotificationsScreen extends StatelessWidget {
           return _buildLoadingState();
         }
 
-        if (controller.notifications.isEmpty) {
+        if (controller.hasError) {
+          return _buildErrorState(controller);
+        }
+
+        if (!controller.hasNotifications) {
           return _buildEmptyState();
         }
 
         return RefreshIndicator(
           onRefresh: () async {
-            controller.refreshNotifications();
+            await controller.refreshNotifications();
           },
           color: AppColors.primary,
           child: _buildNotificationsList(controller),
@@ -42,12 +44,38 @@ class NotificationsScreen extends StatelessWidget {
     return AppBar(
       elevation: 0,
       backgroundColor: AppColors.primary,
-      title: Text(
-        'Notifications',
-        style: AppTextStyles.welcomeTitle.copyWith(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Notifications',
+            style: AppTextStyles.welcomeTitle.copyWith(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Obx(() {
+            if (controller.unreadCount.value > 0) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${controller.unreadCount.value}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              );
+            }
+            return const SizedBox();
+          }),
+        ],
       ),
       centerTitle: true,
       leading: IconButton(
@@ -56,8 +84,7 @@ class NotificationsScreen extends StatelessWidget {
       ),
       actions: [
         Obx(() {
-          final hasUnread = controller.notifications.any((n) => !n.isRead);
-          return hasUnread
+          return controller.hasUnreadNotifications
               ? TextButton(
                   onPressed: () => controller.markAllAsRead(),
                   child: Text(
@@ -67,6 +94,41 @@ class NotificationsScreen extends StatelessWidget {
                 )
               : const SizedBox();
         }),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert, color: Colors.white),
+          onSelected: (value) {
+            switch (value) {
+              case 'cleanup':
+                _showCleanupDialog(controller);
+                break;
+              case 'refresh':
+                controller.refreshNotifications();
+                break;
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'refresh',
+              child: Row(
+                children: [
+                  Icon(Icons.refresh),
+                  SizedBox(width: 8),
+                  Text('Refresh'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'cleanup',
+              child: Row(
+                children: [
+                  Icon(Icons.cleaning_services),
+                  SizedBox(width: 8),
+                  Text('Cleanup Old'),
+                ],
+              ),
+            ),
+          ],
+        ),
         const SizedBox(width: 8),
       ],
     );
@@ -84,6 +146,52 @@ class NotificationsScreen extends StatelessWidget {
           Text(
             'Loading notifications...',
             style: AppTextStyles.body,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(NotificationsController controller) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: AppColors.error.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(60),
+            ),
+            child: Icon(
+              Icons.error_outline,
+              size: 60,
+              color: AppColors.error,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Something went wrong',
+            style: AppTextStyles.title,
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              controller.errorMessage.value,
+              style: AppTextStyles.body,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => controller.refreshNotifications(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Retry'),
           ),
         ],
       ),
@@ -142,6 +250,7 @@ class NotificationsScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => controller.markAsRead(notification.id),
+          onLongPress: () => _showNotificationOptions(notification, controller),
           borderRadius: BorderRadius.circular(16),
           child: Container(
             padding: const EdgeInsets.all(16),
@@ -265,6 +374,81 @@ class NotificationsScreen extends StatelessWidget {
         iconData,
         color: iconColor,
         size: 20,
+      ),
+    );
+  }
+
+  void _showNotificationOptions(NotificationModel notification, NotificationsController controller) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.lightGrey,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Notification Options',
+              style: AppTextStyles.title,
+            ),
+            const SizedBox(height: 20),
+            if (!notification.isRead)
+              ListTile(
+                leading: const Icon(Icons.mark_email_read),
+                title: const Text('Mark as Read'),
+                onTap: () {
+                  Get.back();
+                  controller.markAsRead(notification.id);
+                },
+              ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Delete', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Get.back();
+                controller.deleteNotification(notification.id);
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showCleanupDialog(NotificationsController controller) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Cleanup Old Notifications'),
+        content: const Text('This will delete notifications older than 30 days. Continue?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              controller.cleanupOldNotifications();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Cleanup'),
+          ),
+        ],
       ),
     );
   }

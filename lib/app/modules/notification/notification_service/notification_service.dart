@@ -1,42 +1,18 @@
 // notification_controller.dart
 import 'dart:async';
+import 'package:digislips/app/modules/notification/notification_controller.dart';
 import 'package:digislips/app/modules/notification/notification_model.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// TODO: Replace this with the actual implementation or import if it exists elsewhere.
-class NotificationService {
-  Stream<List<NotificationModel>> getUserNotifications(String userId) => Stream.value([]);
-  Stream<int> getUnreadNotificationCount(String userId) => Stream.value(0);
-  Future<void> markAsRead(String userId, String notificationId) async {}
-  Future<void> markAllAsRead(String userId) async {}
-  Future<void> deleteNotification(String userId, String notificationId) async {}
-  Future<void> deleteOldNotifications(String userId) async {}
-  Future<void> createNotification({
-    required String userId,
-    required String title,
-    required String description,
-    required NotificationType type,
-    Map<String, dynamic>? metadata,
-  }) async {}
-  Future<void> createLeaveStatusNotification({
-    required String userId,
-    required String status,
-    required String leaveId,
-    required DateTime fromDate,
-    required DateTime toDate,
-    String? reviewComments,
-  }) async {}
-}
-
 class NotificationsController extends GetxController {
   final NotificationService _notificationService = NotificationService();
-  
+
   final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
   final RxInt unreadCount = 0.obs;
-  
+
   StreamSubscription<List<NotificationModel>>? _notificationSubscription;
   StreamSubscription<int>? _unreadCountSubscription;
   String? _userId;
@@ -75,10 +51,10 @@ class NotificationsController extends GetxController {
 
   void _loadNotifications() {
     if (_userId == null) return;
-    
+
     isLoading.value = true;
     errorMessage.value = '';
-    
+
     _notificationSubscription?.cancel();
     _notificationSubscription = _notificationService
         .getUserNotifications(_userId!)
@@ -96,7 +72,7 @@ class NotificationsController extends GetxController {
 
   void _loadUnreadCount() {
     if (_userId == null) return;
-    
+
     _unreadCountSubscription?.cancel();
     _unreadCountSubscription = _notificationService
         .getUnreadNotificationCount(_userId!)
@@ -112,7 +88,7 @@ class NotificationsController extends GetxController {
 
   Future<void> markAsRead(String notificationId) async {
     if (_userId == null) return;
-    
+
     try {
       await _notificationService.markAsRead(_userId!, notificationId);
       // The stream will automatically update the UI
@@ -127,7 +103,7 @@ class NotificationsController extends GetxController {
 
   Future<void> markAllAsRead() async {
     if (_userId == null) return;
-    
+
     try {
       isLoading.value = true;
       await _notificationService.markAllAsRead(_userId!);
@@ -150,7 +126,7 @@ class NotificationsController extends GetxController {
 
   Future<void> deleteNotification(String notificationId) async {
     if (_userId == null) return;
-    
+
     try {
       await _notificationService.deleteNotification(_userId!, notificationId);
       Get.snackbar(
@@ -171,7 +147,7 @@ class NotificationsController extends GetxController {
     if (_userId == null) {
       await _getUserId();
     }
-    
+
     if (_userId != null) {
       _loadNotifications();
       _loadUnreadCount();
@@ -180,7 +156,7 @@ class NotificationsController extends GetxController {
 
   Future<void> cleanupOldNotifications() async {
     if (_userId == null) return;
-    
+
     try {
       await _notificationService.deleteOldNotifications(_userId!);
       Get.snackbar(
@@ -206,7 +182,7 @@ class NotificationsController extends GetxController {
   }) async {
     if (_userId == null) await _getUserId();
     if (_userId == null) return;
-    
+
     try {
       await _notificationService.createNotification(
         userId: _userId!,
@@ -230,7 +206,7 @@ class NotificationsController extends GetxController {
   }) async {
     if (_userId == null) await _getUserId();
     if (_userId == null) return;
-    
+
     try {
       await _notificationService.createLeaveStatusNotification(
         userId: _userId!,

@@ -2,7 +2,7 @@
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/core/theme/app_text_styles.dart';
 import 'package:digislips/app/modules/leave/leave_status/leave_controller/leave_controller.dart';
-import 'package:digislips/app/modules/leave/leave_status/leave_model/leave_model.dart';
+import 'package:digislips/app/modules/leave/leave_model/leave_model.dart';
 import 'package:digislips/app/modules/leave/leave_status/leave_request_card/leave_request_card.dart';
 import 'package:digislips/app/modules/leave/leave_status/leave_status_chip/leave_status_chip.dart';
 import 'package:flutter/material.dart';
@@ -152,10 +152,7 @@ class LeaveRequestsScreen extends StatelessWidget {
 
                               return RefreshIndicator(
                                 onRefresh: () async {
-                                  await Future.delayed(
-                                    const Duration(seconds: 1),
-                                  );
-                                  leaveController.loadSampleData();
+                                  await leaveController.refreshLeaveRequests();
                                 },
                                 color: AppColors.primary,
                                 child: ListView.builder(
@@ -312,7 +309,7 @@ class LeaveRequestsScreen extends StatelessWidget {
     );
   }
 
-  void _showLeaveDetails(BuildContext context, LeaveRequest request) {
+  void _showLeaveDetails(BuildContext context, LeaveModel request) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -332,7 +329,7 @@ class LeaveRequestsScreen extends StatelessWidget {
                       color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.event_note,
                       color: AppColors.primary,
                       size: 24,
@@ -343,7 +340,7 @@ class LeaveRequestsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(request.type, style: AppTextStyles.title),
+                        Text(request.leaveType, style: AppTextStyles.title),
                         const SizedBox(height: 4),
                         StatusChip(status: request.status),
                       ],
@@ -354,23 +351,37 @@ class LeaveRequestsScreen extends StatelessWidget {
               const SizedBox(height: 24),
               _buildDetailRow(
                 'Duration',
-                '${request.duration} ${request.duration == 1 ? 'day' : 'days'}',
+                '${request.totalDays} ${request.totalDays == 1 ? 'day' : 'days'}',
               ),
               const SizedBox(height: 16),
               _buildDetailRow(
                 'Start Date',
-                DateFormat('MMM dd, yyyy').format(request.startDate),
+                DateFormat('MMM dd, yyyy').format(request.fromDate),
               ),
               const SizedBox(height: 16),
               _buildDetailRow(
                 'End Date',
-                DateFormat('MMM dd, yyyy').format(request.endDate),
+                DateFormat('MMM dd, yyyy').format(request.toDate),
               ),
               const SizedBox(height: 16),
               _buildDetailRow(
                 'Submitted On',
-                DateFormat('MMM dd, yyyy').format(request.submissionDate),
+                DateFormat('MMM dd, yyyy').format(request.submittedAt),
               ),
+              if (request.reviewedAt != null) ...[
+                const SizedBox(height: 16),
+                _buildDetailRow(
+                  'Reviewed On',
+                  DateFormat('MMM dd, yyyy').format(request.reviewedAt!),
+                ),
+              ],
+              if (request.reviewedBy != null) ...[
+                const SizedBox(height: 16),
+                _buildDetailRow(
+                  'Reviewed By',
+                  request.reviewedBy!,
+                ),
+              ],
               const SizedBox(height: 16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,20 +401,22 @@ class LeaveRequestsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              if (request.rejectionReason != null) ...[
+              if (request.reviewComments != null && request.reviewComments!.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Rejection Reason',
+                      request.status.toLowerCase() == 'rejected' ? 'Rejection Reason' : 'Review Comments',
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.rejectedColor,
+                        color: request.status.toLowerCase() == 'rejected' 
+                            ? AppColors.rejectedColor 
+                            : AppColors.greyColor,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      request.rejectionReason!,
+                      request.reviewComments!,
                       style: AppTextStyles.body.copyWith(
                         color: AppColors.blackColor,
                       ),
@@ -412,16 +425,45 @@ class LeaveRequestsScreen extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Get.back(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+              Row(
+                children: [
+                  if (request.status.toLowerCase() == 'pending') ...[
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () async {
+                          Get.back();
+                          final controller = Get.find<LeaveController>();
+                          await controller.deleteLeaveRequest(request.id!);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: const BorderSide(color: AppColors.error),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(color: AppColors.error),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Get.back(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text(
+                        'Close',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
                   ),
-                  child: const Text('Close'),
-                ),
+                ],
               ),
             ],
           ),
@@ -458,7 +500,6 @@ class LeaveRequestsScreen extends StatelessWidget {
 
   void _showAddLeaveDialog(BuildContext context) {
     final leaveController = Get.find<LeaveController>();
-    final typeController = TextEditingController();
     final reasonController = TextEditingController();
     final startDate = Rx<DateTime?>(null);
     final endDate = Rx<DateTime?>(null);
@@ -518,7 +559,6 @@ class LeaveRequestsScreen extends StatelessWidget {
                           .toList(),
                       onChanged: (value) {
                         selectedType.value = value ?? '';
-                        typeController.text = value ?? '';
                       },
                     ),
                   ),
@@ -548,29 +588,26 @@ class LeaveRequestsScreen extends StatelessWidget {
                                 );
                                 if (date != null) startDate.value = date;
                               },
-                              child: Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: AppColors.borderColor,
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: AppColors.borderColor,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: AppColors.lightGrey,
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.calendar_today, size: 16),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      startDate.value != null
+                                          ? DateFormat('MMM dd, yyyy').format(startDate.value!)
+                                          : 'Select',
+                                      style: AppTextStyles.body,
                                     ),
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: AppColors.lightGrey,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.calendar_today, size: 16),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        startDate.value?.toString().split(
-                                              ' ',
-                                            )[0] ??
-                                            'Select',
-                                        style: AppTextStyles.body,
-                                      ),
-                                    ],
-                                  ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -590,8 +627,7 @@ class LeaveRequestsScreen extends StatelessWidget {
                               onTap: () async {
                                 final date = await showDatePicker(
                                   context: context,
-                                  initialDate:
-                                      startDate.value ?? DateTime.now(),
+                                  initialDate: startDate.value ?? DateTime.now(),
                                   firstDate: startDate.value ?? DateTime.now(),
                                   lastDate: DateTime.now().add(
                                     const Duration(days: 365),
@@ -613,8 +649,9 @@ class LeaveRequestsScreen extends StatelessWidget {
                                     const Icon(Icons.calendar_today, size: 16),
                                     const SizedBox(width: 8),
                                     Text(
-                                      endDate.value?.toString().split(' ')[0] ??
-                                          'Select',
+                                      endDate.value != null
+                                          ? DateFormat('MMM dd, yyyy').format(endDate.value!)
+                                          : 'Select',
                                       style: AppTextStyles.body,
                                     ),
                                   ],
@@ -676,37 +713,44 @@ class LeaveRequestsScreen extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {
-                          if (typeController.text.isNotEmpty &&
+                        onPressed: () async {
+                          if (selectedType.value.isNotEmpty &&
                               reasonController.text.isNotEmpty &&
                               startDate.value != null &&
                               endDate.value != null) {
-                            final duration =
-                                endDate.value!
-                                    .difference(startDate.value!)
-                                    .inDays +
-                                1;
-                            final request = LeaveRequest(
-                              id: DateTime.now().millisecondsSinceEpoch
-                                  .toString(),
-                              type: typeController.text,
-                              startDate: startDate.value!,
-                              endDate: endDate.value!,
+                            
+                            // Check for overlapping leave
+                            final hasOverlap = await leaveController.checkOverlappingLeave(
+                              fromDate: startDate.value!,
+                              toDate: endDate.value!,
+                            );
+
+                            if (hasOverlap) {
+                              Get.snackbar(
+                                'Error',
+                                'You already have a leave request for the selected dates',
+                                backgroundColor: AppColors.error.withOpacity(0.1),
+                                colorText: AppColors.error,
+                              );
+                              return;
+                            }
+
+                            final totalDays = endDate.value!.difference(startDate.value!).inDays + 1;
+                            
+                            final request = LeaveModel(
+                              id: DateTime.now().millisecondsSinceEpoch.toString(),
+                              leaveType: selectedType.value,
+                              fromDate: startDate.value!,
+                              toDate: endDate.value!,
+                              totalDays: totalDays,
                               reason: reasonController.text,
-                              status: 'pending',
-                              submissionDate: DateTime.now(),
-                              duration: duration,
+                              status: 'Pending',
+                              submittedAt: DateTime.now(),
+                              submittedBy: leaveController.currentUserId.value,
                             );
-                            leaveController.leaveRequests.add(request);
+                            
+                            await leaveController.addLeaveRequest(request);
                             Get.back();
-                            Get.snackbar(
-                              'Success',
-                              'Leave request submitted successfully',
-                              backgroundColor: AppColors.success.withOpacity(
-                                0.1,
-                              ),
-                              colorText: AppColors.success,
-                            );
                           } else {
                             Get.snackbar(
                               'Error',

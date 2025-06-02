@@ -114,12 +114,11 @@ class RegistrationController extends GetxController {
 
   Future<bool> _isRollNumberExists(String rollNumber, String department) async {
     try {
-      final querySnapshot =
-          await _firestore
-              .collection('students')
-              .where('rollNumber', isEqualTo: rollNumber.trim())
-              .where('department', isEqualTo: department)
-              .get();
+      final querySnapshot = await _firestore
+          .collection('students')
+          .where('rollNumber', isEqualTo: rollNumber.trim())
+          .where('department', isEqualTo: department)
+          .get();
 
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
@@ -151,11 +150,10 @@ class RegistrationController extends GetxController {
 
   Future<bool> _isEmailExists(String email) async {
     try {
-      final querySnapshot =
-          await _firestore
-              .collection('students')
-              .where('email', isEqualTo: email.trim())
-              .get();
+      final querySnapshot = await _firestore
+          .collection('students')
+          .where('email', isEqualTo: email.trim())
+          .get();
 
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
