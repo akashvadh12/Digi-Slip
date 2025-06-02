@@ -16,7 +16,7 @@ class _LoginScreenState extends State<LoginScreen>
   late AnimationController _animationController;
   late AnimationController _logoAnimationController;
   late AnimationController _fadeController;
-  
+
   late Animation<double> _slideAnimation;
   late Animation<double> _logoAnimation;
   late Animation<double> _fadeAnimation;
@@ -25,65 +25,58 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize animation controllers
     _animationController = AnimationController(
       duration: Duration(milliseconds: 1200),
       vsync: this,
     );
-    
+
     _logoAnimationController = AnimationController(
       duration: Duration(milliseconds: 1500),
       vsync: this,
     );
-    
+
     _fadeController = AnimationController(
       duration: Duration(milliseconds: 800),
       vsync: this,
     );
 
     // Initialize animations
-    _slideAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
+    _slideAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
 
-    _logoAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _logoAnimationController,
-      curve: Curves.bounceOut,
-    ));
+    _logoAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _logoAnimationController,
+        curve: Curves.bounceOut,
+      ),
+    );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
 
     _offsetAnimation = Tween<Offset>(
       begin: Offset(0.0, 1.0),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
     // Start animations
     _startAnimations();
   }
 
   void _startAnimations() async {
+    if (!mounted) return; // Ensure the widget is still mounted
     _logoAnimationController.forward();
     await Future.delayed(Duration(milliseconds: 500));
+    if (!mounted) return; // Check again after delay
     _fadeController.forward();
     await Future.delayed(Duration(milliseconds: 300));
+    if (!mounted) return; // Final check
     _animationController.forward();
   }
 
@@ -155,12 +148,13 @@ class _LoginScreenState extends State<LoginScreen>
                     child: Column(
                       children: [
                         ShaderMask(
-                          shaderCallback: (bounds) => LinearGradient(
-                            colors: [
-                              AppColors.primary,
-                              AppColors.primary.withOpacity(0.7),
-                            ],
-                          ).createShader(bounds),
+                          shaderCallback:
+                              (bounds) => LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.primary.withOpacity(0.7),
+                                ],
+                              ).createShader(bounds),
                           child: Text(
                             'DigiSlips',
                             style: AppTextStyles.brandName?.copyWith(
@@ -219,7 +213,8 @@ class _LoginScreenState extends State<LoginScreen>
                                 child: Align(
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
-                                    onPressed: () => _showForgotPasswordDialog(),
+                                    onPressed:
+                                        () => _showForgotPasswordDialog(),
                                     child: Text(
                                       'Forgot Password?',
                                       style: TextStyle(
@@ -322,10 +317,7 @@ class _LoginScreenState extends State<LoginScreen>
       animation: _slideAnimation,
       builder: (context, child) {
         return Transform.translate(
-          offset: Offset(
-            100 * (1 - _slideAnimation.value),
-            0,
-          ),
+          offset: Offset(100 * (1 - _slideAnimation.value), 0),
           child: Opacity(
             opacity: _slideAnimation.value.clamp(0.0, 1.0),
             child: Column(
@@ -397,17 +389,11 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(
-                          color: Colors.red,
-                          width: 1,
-                        ),
+                        borderSide: BorderSide(color: Colors.red, width: 1),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(
-                          color: Colors.red,
-                          width: 2,
-                        ),
+                        borderSide: BorderSide(color: Colors.red, width: 2),
                       ),
                     ),
                   ),
@@ -425,10 +411,7 @@ class _LoginScreenState extends State<LoginScreen>
       animation: _slideAnimation,
       builder: (context, child) {
         return Transform.translate(
-          offset: Offset(
-            100 * (1 - _slideAnimation.value),
-            0,
-          ),
+          offset: Offset(100 * (1 - _slideAnimation.value), 0),
           child: Opacity(
             opacity: _slideAnimation.value.clamp(0.0, 1.0),
             child: Column(
@@ -515,17 +498,11 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
-                            color: Colors.red,
-                            width: 1,
-                          ),
+                          borderSide: BorderSide(color: Colors.red, width: 1),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
-                            color: Colors.red,
-                            width: 2,
-                          ),
+                          borderSide: BorderSide(color: Colors.red, width: 2),
                         ),
                       ),
                     ),
@@ -571,30 +548,34 @@ class _LoginScreenState extends State<LoginScreen>
                 color: Colors.transparent,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(15),
-                  onTap: controller.isLoading.value ? null : () {
-                    HapticFeedback.mediumImpact();
-                    controller.login();
-                  },
+                  onTap:
+                      controller.isLoading.value
+                          ? null
+                          : () {
+                            HapticFeedback.mediumImpact();
+                            controller.login();
+                          },
                   child: Container(
                     alignment: Alignment.center,
-                    child: controller.isLoading.value
-                        ? SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2.5,
+                    child:
+                        controller.isLoading.value
+                            ? SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.5,
+                              ),
+                            )
+                            : Text(
+                              'Log In',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
                             ),
-                          )
-                        : Text(
-                            'Log In',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
                   ),
                 ),
               ),
@@ -612,7 +593,7 @@ class _LoginScreenState extends State<LoginScreen>
       builder: (BuildContext context) {
         final TextEditingController emailController = TextEditingController();
         final RxBool isLoading = false.obs;
-        
+
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -652,49 +633,48 @@ class _LoginScreenState extends State<LoginScreen>
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () => Get.back(),
-              child: Text('Cancel'),
-            ),
+            TextButton(onPressed: () => Get.back(), child: Text('Cancel')),
             Obx(
               () => ElevatedButton(
-                onPressed: isLoading.value
-                    ? null
-                    : () async {
-                        if (emailController.text.trim().isEmpty) {
-                          Get.snackbar(
-                            'Error',
-                            'Please enter your email address',
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
-                          );
-                          return;
-                        }
-                        
-                        isLoading.value = true;
-                        await controller.forgotPassword();
-                        isLoading.value = false;
-                        Get.back();
-                      },
+                onPressed:
+                    isLoading.value
+                        ? null
+                        : () async {
+                          if (emailController.text.trim().isEmpty) {
+                            Get.snackbar(
+                              'Error',
+                              'Please enter your email address',
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                            return;
+                          }
+
+                          isLoading.value = true;
+                          await controller.forgotPassword();
+                          isLoading.value = false;
+                          Get.back();
+                        },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: isLoading.value
-                    ? SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
+                child:
+                    isLoading.value
+                        ? SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                        : Text(
+                          'Send Reset Link',
+                          style: TextStyle(color: Colors.white),
                         ),
-                      )
-                    : Text(
-                        'Send Reset Link',
-                        style: TextStyle(color: Colors.white),
-                      ),
               ),
             ),
           ],

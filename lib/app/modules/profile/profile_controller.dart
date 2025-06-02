@@ -1,7 +1,11 @@
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/core/theme/app_text_styles.dart';
+import 'package:digislips/app/modules/splash_screen/splash_screen.dart';
+import 'package:digislips/app/routes/app_rout.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileController extends GetxController {
   // Profile data
@@ -12,16 +16,16 @@ class ProfileController extends GetxController {
   final String email = "john.anderson@digislips.edu";
   final String phone = "+1 (555) 123-4567";
   final String semester = "4th Semester";
-  
+
   // Loading states
   var isLoading = false.obs;
   var isEditingProfile = false.obs;
-  
+
   void editProfile() {
     isEditingProfile.value = true;
     // Navigate to edit profile screen
     Get.snackbar(
-      'Edit Profile', 
+      'Edit Profile',
       'Navigating to edit profile...',
       backgroundColor: AppColors.primary.withOpacity(0.1),
       colorText: AppColors.primary,
@@ -31,10 +35,10 @@ class ProfileController extends GetxController {
       duration: Duration(seconds: 2),
     );
   }
-  
+
   void changePassword() {
     Get.snackbar(
-      'Change Password', 
+      'Change Password',
       'Navigating to change password...',
       backgroundColor: AppColors.secondary.withOpacity(0.1),
       colorText: AppColors.secondary,
@@ -44,7 +48,7 @@ class ProfileController extends GetxController {
       duration: Duration(seconds: 2),
     );
   }
-  
+
   void logout() {
     Get.dialog(
       AlertDialog(
@@ -76,10 +80,19 @@ class ProfileController extends GetxController {
               borderRadius: BorderRadius.circular(8),
             ),
             child: TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Get.back();
+
+                // 1. Sign out from Firebase
+                await FirebaseAuth.instance.signOut();
+
+                // 2. Clear UID from SharedPreferences
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.remove('uid');
+
+                // 3. Show snackbar first
                 Get.snackbar(
-                  'Logged Out', 
+                  'Logged Out',
                   'You have been successfully logged out',
                   backgroundColor: AppColors.error.withOpacity(0.1),
                   colorText: AppColors.error,
@@ -87,9 +100,15 @@ class ProfileController extends GetxController {
                   margin: EdgeInsets.all(16),
                   borderRadius: 12,
                 );
+
+                // 4. Wait a little so user sees the snackbar, then navigate
+                await Future.delayed(Duration(milliseconds: 500));
+
+                // 5. Navigate to login screen and clear navigation stack
+                Get.offAll(() => SplashScreen(), transition: Transition.fadeIn);
               },
               child: Text(
-                'Logout', 
+                'Logout',
                 style: AppTextStyles.buttonText.copyWith(color: Colors.white),
               ),
             ),

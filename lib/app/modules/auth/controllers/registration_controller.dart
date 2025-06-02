@@ -1,10 +1,13 @@
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/modules/auth/login/login_page.dart';
+import 'package:digislips/app/modules/auth/models/user_model.dart';
+import 'package:digislips/app/modules/splash_screen/splash_screen.dart';
 import 'package:digislips/app/shared/widgets/bottomnavigation/bottomnavigation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegistrationController extends GetxController {
   // Text Controllers
@@ -46,12 +49,10 @@ class RegistrationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Listen to password changes for real-time validation
     passwordController.addListener(_validatePasswordRequirements);
   }
 
-  // ------------------- Password Visibility -------------------
-
+  // Toggle password visibility
   void togglePasswordVisibility() {
     isPasswordHidden.value = !isPasswordHidden.value;
   }
@@ -60,8 +61,7 @@ class RegistrationController extends GetxController {
     isConfirmPasswordHidden.value = !isConfirmPasswordHidden.value;
   }
 
-  // ------------------- Password Validation -------------------
-
+  // Password validation
   void _validatePasswordRequirements() {
     String password = passwordController.text;
 
@@ -72,88 +72,54 @@ class RegistrationController extends GetxController {
     hasSpecialChar.value = password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
   }
 
-  bool get isPasswordStrong {
-    return hasMinLength.value &&
-        hasUppercase.value &&
-        hasLowercase.value &&
-        hasNumber.value &&
-        hasSpecialChar.value;
-  }
+  bool get isPasswordStrong =>
+      hasMinLength.value &&
+      hasUppercase.value &&
+      hasLowercase.value &&
+      hasNumber.value &&
+      hasSpecialChar.value;
 
-  // ------------------- Field Validation -------------------
-
-  String? validateFullName(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Full name is required';
+  // Field validations
+  String? validateFullName(String fullName) {
+    if (fullName.isEmpty) {
+      return 'Full name cannot be empty';
     }
-    if (value.trim().length < 2) {
-      return 'Name must be at least 2 characters';
-    }
-    if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value.trim())) {
-      return 'Name can only contain letters and spaces';
+    if (fullName.length < 3) {
+      return 'Full name must be at least 3 characters long';
     }
     return null;
   }
 
-  String? validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Email is required';
+  String? validatePassword(String password) {
+    if (password.isEmpty) {
+      return 'Password cannot be empty';
     }
-    if (!GetUtils.isEmail(value.trim())) {
-      return 'Enter a valid email address';
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long';
     }
-    return null;
-  }
-
-  String? validatePhone(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Phone number is required';
+    if (!password.contains(RegExp(r'[A-Z]'))) {
+      return 'Password must contain at least one uppercase letter';
     }
-    if (!RegExp(r'^\+?[1-9]\d{1,14}$').hasMatch(value.trim())) {
-      return 'Enter a valid phone number';
+    if (!password.contains(RegExp(r'[a-z]'))) {
+      return 'Password must contain at least one lowercase letter';
     }
-    return null;
-  }
-
-  String? validateRollNumber(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Roll number is required';
+    if (!password.contains(RegExp(r'[0-9]'))) {
+      return 'Password must contain at least one number';
     }
-    if (value.trim().length < 3) {
-      return 'Roll number must be at least 3 characters';
+    if (!password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+      return 'Password must contain at least one special character';
     }
     return null;
   }
-
-  String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password is required';
-    }
-    if (!isPasswordStrong) {
-      return 'Password does not meet requirements';
-    }
-    return null;
-  }
-
-  String? validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
-    }
-    if (value != passwordController.text) {
-      return 'Passwords do not match';
-    }
-    return null;
-  }
-
-  // ------------------- Check if Roll Number Exists -------------------
 
   Future<bool> _isRollNumberExists(String rollNumber, String department) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('students')
-          .where('rollNumber', isEqualTo: rollNumber.trim())
-          .where('department', isEqualTo: department)
-          .get();
+      final querySnapshot =
+          await _firestore
+              .collection('students')
+              .where('rollNumber', isEqualTo: rollNumber.trim())
+              .where('department', isEqualTo: department)
+              .get();
 
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
@@ -162,14 +128,34 @@ class RegistrationController extends GetxController {
     }
   }
 
-  // ------------------- Check if Email Exists -------------------
+  String? validateRollNumber(String rollNumber) {
+    if (rollNumber.isEmpty) {
+      return 'Roll number cannot be empty';
+    }
+    if (rollNumber.length < 5) {
+      return 'Roll number must be at least 5 characters long';
+    }
+    return null;
+  }
+
+  String? validateEmail(String email) {
+    if (email.isEmpty) {
+      return 'Email cannot be empty';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(email)) {
+      return 'Invalid email format';
+    }
+    return null;
+  }
 
   Future<bool> _isEmailExists(String email) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('students')
-          .where('email', isEqualTo: email.trim())
-          .get();
+      final querySnapshot =
+          await _firestore
+              .collection('students')
+              .where('email', isEqualTo: email.trim())
+              .get();
 
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
@@ -178,81 +164,104 @@ class RegistrationController extends GetxController {
     }
   }
 
-  // ------------------- Registration -------------------
-
+  // Registration
   Future<void> registerStudent() async {
     if (!_validateForm()) return;
 
-    try {
-      isLoading(true);
+    isLoading(true);
 
+    try {
       String email = emailController.text.trim();
       String rollNumber = rollNumberController.text.trim();
 
-      // Check if roll number already exists in the same department
-      bool rollExists = await _isRollNumberExists(
-        rollNumber,
-        selectedDepartment.value,
-      );
-      if (rollExists) {
+      // Check if roll number exists
+      if (await _isRollNumberExists(rollNumber, selectedDepartment.value)) {
+        isLoading(false);
         Get.snackbar(
           'Registration Failed',
           'Roll number already exists in ${selectedDepartment.value} department',
           backgroundColor: AppColors.error,
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
-          margin: EdgeInsets.all(16),
+          margin: const EdgeInsets.all(16),
           borderRadius: 12,
         );
         return;
       }
 
-      // Check if email already exists
-      bool emailExists = await _isEmailExists(email);
-      if (emailExists) {
+      // Check if email exists
+      if (await _isEmailExists(email)) {
+        isLoading(false);
         Get.snackbar(
           'Registration Failed',
           'An account with this email already exists',
           backgroundColor: AppColors.error,
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
-          margin: EdgeInsets.all(16),
+          margin: const EdgeInsets.all(16),
           borderRadius: 12,
         );
         return;
       }
 
-      // Create user with Firebase Auth
+      // Create user in Firebase Auth
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(
             email: email,
             password: passwordController.text,
           );
 
-      // Update user profile
-      await userCredential.user?.updateDisplayName(
-        fullNameController.text.trim(),
+      if (userCredential.user == null) {
+        isLoading(false);
+        Get.snackbar(
+          'Registration Failed',
+          'Failed to create user',
+          backgroundColor: AppColors.error,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(16),
+          borderRadius: 12,
+        );
+        return;
+      }
+
+      // Update display name
+      try {
+        await userCredential.user?.updateDisplayName(
+          fullNameController.text.trim(),
+        );
+      } catch (e) {
+        print('Failed to update display name: $e');
+      }
+
+      // Prepare student model
+      final student = Student(
+        uid: userCredential.user!.uid,
+        fullName: fullNameController.text.trim(),
+        email: email,
+        phone: phoneController.text.trim(),
+        department: selectedDepartment.value,
+        rollNumber: rollNumber,
+        isEmailVerified: false,
+        profileComplete: true,
       );
 
-      // Save student info to Firestore
+      // Save to Firestore
       await _firestore
           .collection('students')
-          .doc(userCredential.user?.uid)
-          .set({
-            'uid': userCredential.user?.uid,
-            'fullName': fullNameController.text.trim(),
-            'email': email,
-            'phone': phoneController.text.trim(),
-            'department': selectedDepartment.value,
-            'rollNumber': rollNumber,
-            'isEmailVerified': false,
-            'profileComplete': true,
-            'createdAt': FieldValue.serverTimestamp(),
-            'updatedAt': FieldValue.serverTimestamp(),
-          });
+          .doc(student.uid)
+          .set(student.toMap());
 
       // Send email verification
-      await userCredential.user?.sendEmailVerification();
+      try {
+        await userCredential.user?.sendEmailVerification();
+      } catch (e) {
+        print('Failed to send email verification: $e');
+      }
+
+      // Save UID in SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('uid', student.uid);
 
       Get.snackbar(
         'Registration Successful!',
@@ -260,16 +269,16 @@ class RegistrationController extends GetxController {
         backgroundColor: Colors.green,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
-        margin: EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
         borderRadius: 12,
-        duration: Duration(seconds: 5),
+        duration: const Duration(seconds: 5),
       );
 
-      // Clear form
       _clearForm();
 
-      // Navigate to login or dashboard
-      Get.offAll(() => LoginScreen());
+      // Navigate to login screen
+      await FirebaseAuth.instance.signOut();
+      Get.offAll(() => SplashScreen());
     } on FirebaseAuthException catch (e) {
       String errorMessage;
       switch (e.code) {
@@ -288,14 +297,13 @@ class RegistrationController extends GetxController {
         default:
           errorMessage = 'Registration failed: ${e.message}';
       }
-
       Get.snackbar(
         'Registration Failed',
         errorMessage,
         backgroundColor: AppColors.error,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
-        margin: EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
         borderRadius: 12,
       );
     } catch (e) {
@@ -305,7 +313,7 @@ class RegistrationController extends GetxController {
         backgroundColor: AppColors.error,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
-        margin: EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
         borderRadius: 12,
       );
     } finally {
@@ -313,35 +321,31 @@ class RegistrationController extends GetxController {
     }
   }
 
-  // ------------------- Form Validation -------------------
-
   bool _validateForm() {
-    List<String> errors = [];
+    final validators = {
+      'Full Name': validateFullName(fullNameController.text),
+      'Email': validateEmail(emailController.text),
+      'Phone': validatePhone(phoneController.text),
+      'Roll Number': validateRollNumber(rollNumberController.text),
+      'Password': validatePassword(passwordController.text),
+      'Confirm Password': validateConfirmPassword(
+        confirmPasswordController.text,
+      ),
+    };
 
-    final fullNameError = validateFullName(fullNameController.text);
-    final emailError = validateEmail(emailController.text);
-    final phoneError = validatePhone(phoneController.text);
-    final rollError = validateRollNumber(rollNumberController.text);
-    final passwordError = validatePassword(passwordController.text);
-    final confirmPasswordError = validateConfirmPassword(
-      confirmPasswordController.text,
+    final firstError = validators.values.firstWhere(
+      (v) => v != null,
+      orElse: () => null,
     );
 
-    if (fullNameError != null) errors.add(fullNameError);
-    if (emailError != null) errors.add(emailError);
-    if (phoneError != null) errors.add(phoneError);
-    if (rollError != null) errors.add(rollError);
-    if (passwordError != null) errors.add(passwordError);
-    if (confirmPasswordError != null) errors.add(confirmPasswordError);
-
-    if (errors.isNotEmpty) {
+    if (firstError != null) {
       Get.snackbar(
         'Validation Error',
-        errors.first,
+        firstError,
         backgroundColor: AppColors.error,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
-        margin: EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
         borderRadius: 12,
       );
       return false;
@@ -349,7 +353,26 @@ class RegistrationController extends GetxController {
     return true;
   }
 
-  // ------------------- Helper Methods -------------------
+  String? validatePhone(String phone) {
+    if (phone.isEmpty) {
+      return 'Phone number cannot be empty';
+    }
+    final phoneRegex = RegExp(r'^\d{10}$');
+    if (!phoneRegex.hasMatch(phone)) {
+      return 'Invalid phone number format';
+    }
+    return null;
+  }
+
+  String? validateConfirmPassword(String confirmPassword) {
+    if (confirmPassword.isEmpty) {
+      return 'Confirm password cannot be empty';
+    }
+    if (confirmPassword != passwordController.text) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
 
   void _clearForm() {
     fullNameController.clear();

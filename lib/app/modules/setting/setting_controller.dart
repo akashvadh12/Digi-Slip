@@ -1,7 +1,10 @@
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/core/theme/app_text_styles.dart';
+import 'package:digislips/app/routes/app_pages.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Settings Controller using GetX
 class SettingsController extends GetxController {
@@ -10,7 +13,7 @@ class SettingsController extends GetxController {
   var userRole = 'Student'.obs;
   var userDepartment = 'Computer Science'.obs;
   var isLoading = false.obs;
-  
+
   // Form controllers
   final currentPasswordController = TextEditingController();
   final newPasswordController = TextEditingController();
@@ -18,7 +21,7 @@ class SettingsController extends GetxController {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
-  
+
   @override
   void onInit() {
     super.onInit();
@@ -27,7 +30,7 @@ class SettingsController extends GetxController {
     emailController.text = 'john.anderson@example.com';
     phoneController.text = '+1 234 567 8900';
   }
-  
+
   @override
   void onClose() {
     currentPasswordController.dispose();
@@ -38,35 +41,50 @@ class SettingsController extends GetxController {
     phoneController.dispose();
     super.onClose();
   }
-  
+
   void toggleNotifications() {
     notificationsEnabled.value = !notificationsEnabled.value;
     Get.snackbar(
       'Notifications',
-      notificationsEnabled.value ? 'Notifications enabled' : 'Notifications disabled',
+      notificationsEnabled.value
+          ? 'Notifications enabled'
+          : 'Notifications disabled',
       backgroundColor: AppColors.success,
       colorText: Colors.white,
       snackPosition: SnackPosition.TOP,
       duration: Duration(seconds: 2),
     );
   }
-  
+
   void logout() {
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Logout', style: AppTextStyles.title),
-        content: Text('Are you sure you want to logout?', style: AppTextStyles.body),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: AppTextStyles.body,
+        ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
             child: Text('Cancel', style: TextStyle(color: AppColors.greyColor)),
           ),
           ElevatedButton(
-            onPressed: () {
-              Get.back();
-              // Add actual logout logic here
-              Get.offAllNamed('/login');
+            onPressed: () async {
+              Get.back(); // Close the dialog first
+
+              // 1. Sign out from Firebase
+              await FirebaseAuth.instance.signOut();
+
+              // 2. Clear UID from SharedPreferences
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('uid');
+
+              // 3. Navigate to login screen (clear all previous routes)
+              Get.offAllNamed(Routes.LOGIN);
+
+              // 4. Show logout success snackbar
               Get.snackbar(
                 'Success',
                 'Logged out successfully',
@@ -77,15 +95,17 @@ class SettingsController extends GetxController {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            child: Text('Logout', style: TextStyle(color: Colors.white)),
+            child: const Text('Logout', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
   }
-  
+
   void showEditProfileDialog() {
     Get.dialog(
       Dialog(
@@ -98,32 +118,55 @@ class SettingsController extends GetxController {
             children: [
               Text('Edit Profile', style: AppTextStyles.title),
               SizedBox(height: 20),
-              
-              _buildTextField('Full Name', nameController, Icons.person_outline),
+
+              _buildTextField(
+                'Full Name',
+                nameController,
+                Icons.person_outline,
+              ),
               SizedBox(height: 16),
               _buildTextField('Email', emailController, Icons.email_outlined),
               SizedBox(height: 16),
               _buildTextField('Phone', phoneController, Icons.phone_outlined),
-              
+
               SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
                     onPressed: () => Get.back(),
-                    child: Text('Cancel', style: TextStyle(color: AppColors.greyColor)),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: AppColors.greyColor),
+                    ),
                   ),
                   SizedBox(width: 12),
-                  Obx(() => ElevatedButton(
-                    onPressed: isLoading.value ? null : () => _updateProfile(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  Obx(
+                    () => ElevatedButton(
+                      onPressed:
+                          isLoading.value ? null : () => _updateProfile(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child:
+                          isLoading.value
+                              ? SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : Text(
+                                'Update',
+                                style: TextStyle(color: Colors.white),
+                              ),
                     ),
-                    child: isLoading.value 
-                        ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : Text('Update', style: TextStyle(color: Colors.white)),
-                  )),
+                  ),
                 ],
               ),
             ],
@@ -132,7 +175,7 @@ class SettingsController extends GetxController {
       ),
     );
   }
-  
+
   void showChangePasswordDialog() {
     Get.dialog(
       Dialog(
@@ -145,13 +188,19 @@ class SettingsController extends GetxController {
             children: [
               Text('Change Password', style: AppTextStyles.title),
               SizedBox(height: 20),
-              
-              _buildPasswordField('Current Password', currentPasswordController),
+
+              _buildPasswordField(
+                'Current Password',
+                currentPasswordController,
+              ),
               SizedBox(height: 16),
               _buildPasswordField('New Password', newPasswordController),
               SizedBox(height: 16),
-              _buildPasswordField('Confirm New Password', confirmPasswordController),
-              
+              _buildPasswordField(
+                'Confirm New Password',
+                confirmPasswordController,
+              ),
+
               SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -161,19 +210,38 @@ class SettingsController extends GetxController {
                       _clearPasswordFields();
                       Get.back();
                     },
-                    child: Text('Cancel', style: TextStyle(color: AppColors.greyColor)),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: AppColors.greyColor),
+                    ),
                   ),
                   SizedBox(width: 12),
-                  Obx(() => ElevatedButton(
-                    onPressed: isLoading.value ? null : () => _changePassword(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  Obx(
+                    () => ElevatedButton(
+                      onPressed:
+                          isLoading.value ? null : () => _changePassword(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child:
+                          isLoading.value
+                              ? SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : Text(
+                                'Change',
+                                style: TextStyle(color: Colors.white),
+                              ),
                     ),
-                    child: isLoading.value 
-                        ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : Text('Change', style: TextStyle(color: Colors.white)),
-                  )),
+                  ),
                 ],
               ),
             ],
@@ -182,7 +250,7 @@ class SettingsController extends GetxController {
       ),
     );
   }
-  
+
   void showPrivacyPolicyDialog() {
     Get.dialog(
       Dialog(
@@ -235,7 +303,9 @@ Last updated: January 2024''',
                   onPressed: () => Get.back(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: Text('Close', style: TextStyle(color: Colors.white)),
                 ),
@@ -246,7 +316,7 @@ Last updated: January 2024''',
       ),
     );
   }
-  
+
   void showHelpSupportDialog() {
     Get.dialog(
       Dialog(
@@ -259,7 +329,7 @@ Last updated: January 2024''',
             children: [
               Text('Help & Support', style: AppTextStyles.title),
               SizedBox(height: 20),
-              
+
               _buildSupportOption(
                 Icons.email_outlined,
                 'Email Support',
@@ -287,7 +357,7 @@ Last updated: January 2024''',
                 'Frequently Asked Questions',
                 () => _contactSupport('faq'),
               ),
-              
+
               SizedBox(height: 24),
               Align(
                 alignment: Alignment.centerRight,
@@ -295,7 +365,9 @@ Last updated: January 2024''',
                   onPressed: () => Get.back(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: Text('Close', style: TextStyle(color: Colors.white)),
                 ),
@@ -306,8 +378,12 @@ Last updated: January 2024''',
       ),
     );
   }
-  
-  Widget _buildTextField(String label, TextEditingController controller, IconData icon) {
+
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller,
+    IconData icon,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -332,7 +408,7 @@ Last updated: January 2024''',
       ],
     );
   }
-  
+
   Widget _buildPasswordField(String label, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,8 +435,13 @@ Last updated: January 2024''',
       ],
     );
   }
-  
-  Widget _buildSupportOption(IconData icon, String title, String subtitle, VoidCallback onTap) {
+
+  Widget _buildSupportOption(
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -396,22 +477,27 @@ Last updated: January 2024''',
       ),
     );
   }
-  
+
   void _updateProfile() async {
     if (nameController.text.isEmpty) {
-      Get.snackbar('Error', 'Name cannot be empty', backgroundColor: AppColors.error, colorText: Colors.white);
+      Get.snackbar(
+        'Error',
+        'Name cannot be empty',
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
+      );
       return;
     }
-    
+
     isLoading.value = true;
-    
+
     // Simulate API call
     await Future.delayed(Duration(seconds: 2));
-    
+
     userName.value = nameController.text;
     isLoading.value = false;
     Get.back();
-    
+
     Get.snackbar(
       'Success',
       'Profile updated successfully',
@@ -420,34 +506,49 @@ Last updated: January 2024''',
       snackPosition: SnackPosition.TOP,
     );
   }
-  
+
   void _changePassword() async {
-    if (currentPasswordController.text.isEmpty || 
-        newPasswordController.text.isEmpty || 
+    if (currentPasswordController.text.isEmpty ||
+        newPasswordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty) {
-      Get.snackbar('Error', 'All fields are required', backgroundColor: AppColors.error, colorText: Colors.white);
+      Get.snackbar(
+        'Error',
+        'All fields are required',
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
+      );
       return;
     }
-    
+
     if (newPasswordController.text != confirmPasswordController.text) {
-      Get.snackbar('Error', 'New passwords do not match', backgroundColor: AppColors.error, colorText: Colors.white);
+      Get.snackbar(
+        'Error',
+        'New passwords do not match',
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
+      );
       return;
     }
-    
+
     if (newPasswordController.text.length < 6) {
-      Get.snackbar('Error', 'Password must be at least 6 characters', backgroundColor: AppColors.error, colorText: Colors.white);
+      Get.snackbar(
+        'Error',
+        'Password must be at least 6 characters',
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
+      );
       return;
     }
-    
+
     isLoading.value = true;
-    
+
     // Simulate API call
     await Future.delayed(Duration(seconds: 2));
-    
+
     isLoading.value = false;
     _clearPasswordFields();
     Get.back();
-    
+
     Get.snackbar(
       'Success',
       'Password changed successfully',
@@ -456,13 +557,13 @@ Last updated: January 2024''',
       snackPosition: SnackPosition.TOP,
     );
   }
-  
+
   void _clearPasswordFields() {
     currentPasswordController.clear();
     newPasswordController.clear();
     confirmPasswordController.clear();
   }
-  
+
   void _contactSupport(String type) {
     Get.back();
     String message = '';
@@ -480,7 +581,7 @@ Last updated: January 2024''',
         message = 'Opening FAQ page...';
         break;
     }
-    
+
     Get.snackbar(
       'Support',
       message,

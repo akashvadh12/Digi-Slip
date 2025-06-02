@@ -1,9 +1,11 @@
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/modules/auth/StudentRegistration/StudentRegistration.dart';
+import 'package:digislips/app/routes/app_pages.dart';
 import 'package:digislips/app/shared/widgets/bottomnavigation/bottomnavigation.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
@@ -14,6 +16,23 @@ class LoginController extends GetxController {
   final isPasswordVisible = false.obs;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _checkIfLoggedIn(); // Check on startup
+  }
+
+  // Auto-login check
+  Future<void> _checkIfLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    final uid = prefs.getString('uid');
+
+    if (uid != null && _auth.currentUser != null) {
+      // If UID exists and session is valid
+      Get.offAll(() => BottomNavBarWidget());
+    }
+  }
 
   // Toggle password visibility
   void togglePasswordVisibility() {
@@ -44,27 +63,29 @@ class LoginController extends GetxController {
 
   // Login method with form validation
   Future<void> login() async {
-    if (!formKey.currentState!.validate()) {
-      _showSnackbar('Validation Error', 'Please correct the errors in the form');
-      return;
-    }
+    if (!formKey.currentState!.validate()) return;
 
     isLoading(true);
     try {
       final email = emailController.text.trim();
       final password = passwordController.text.trim();
 
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      _showSnackbar('Success', 'Login successful!', isSuccess: true);
+      if (userCredential.user != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('uid', userCredential.user!.uid);
 
-      // Navigate to dashboard
-      Get.offAll(() => BottomNavBarWidget());
+        // Navigate to dashboard and remove login from stack
+        Get.offAllNamed(Routes.BOTTOM_NAVIGATION);
 
+        _showSnackbar('Success', 'Login successful!', isSuccess: true);
+      }
     } on FirebaseAuthException catch (e) {
       _handleFirebaseError(e);
-    } catch (e) {
-      _showSnackbar('Error', 'Unexpected error: ${e.toString()}');
     } finally {
       isLoading(false);
     }
@@ -123,7 +144,8 @@ class LoginController extends GetxController {
       'network-request-failed': 'Network error. Check your connection.',
     };
 
-    final errorMessage = errorMessages[e.code] ?? (e.message ?? 'Login failed. Try again.');
+    final errorMessage =
+        errorMessages[e.code] ?? (e.message ?? 'Login failed. Try again.');
 
     _showSnackbar('Error', errorMessage);
   }
