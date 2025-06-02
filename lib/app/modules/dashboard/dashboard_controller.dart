@@ -1,5 +1,11 @@
 // app/modules/home/controllers/home_controller.dart
+import 'package:digislips/app/modules/dashboard/dashboard.dart';
 import 'package:digislips/app/modules/leave/leave_form/leave_form_page.dart';
+import 'package:digislips/app/modules/leave/leave_status/leave_status_page.dart';
+import 'package:digislips/app/modules/logout/logout.dart';
+import 'package:digislips/app/modules/notification/notification_screen.dart';
+import 'package:digislips/app/modules/profile/Profile_screen.dart';
+import 'package:digislips/app/modules/setting/setting.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -19,6 +25,7 @@ class LeaveApplication {
 
 class HomeController extends GetxController {
   var selectedIndex = 0.obs;
+ 
 
   final employee = {
     'name': 'Alex Johnson',
@@ -62,6 +69,7 @@ class HomeController extends GetxController {
   }
 
   void onViewLeaveStatus() {
+    Get.to(LeaveRequestsScreen());
     Get.snackbar(
       'Leave Status',
       'Navigate to leave status page',
@@ -70,6 +78,7 @@ class HomeController extends GetxController {
   }
 
   void onMyProfile() {
+    Get.to(ProfileScreen());
     Get.snackbar(
       'My Profile',
       'Navigate to profile page',
@@ -78,6 +87,7 @@ class HomeController extends GetxController {
   }
 
   void onLogout() {
+    Get.to(LogoutPage());
     Get.snackbar(
       'Logout',
       'Logging out...',

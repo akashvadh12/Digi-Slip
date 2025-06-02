@@ -43,7 +43,32 @@ class AppTextStyles {
     fontSize: 18,
     fontWeight: FontWeight.w600,
     color: Colors.black,
+  );  static const body = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.greyColor,
+    height: 1.4,
   );
+  
+  static const bodyMedium = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: AppColors.blackColor,
+  );
+  
+  static const caption = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: AppColors.greyColor,
+  );
+  
+
+  static const profileSubtitleBold = TextStyle(
+    fontSize: 16, 
+    fontWeight: FontWeight.w500,
+    color: AppColors.blackColor,
+  );
+  
   static const profileSubtitle = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w400,
@@ -79,17 +104,40 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     color: Colors.orange,
   );
-  static const body = TextStyle(fontSize: 14);
+  static const heading = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
   static const statusRejected = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w500,
     color: AppColors.error,
   );
-  static const bottomNavLabel = TextStyle(
+  static final bottomNavLabel = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w400,
     color: AppColors.textGrey,
   );
+  static const bottomNavInactiveLabel = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textGrey,
+  );
+  static const bottomNavActiveIcon = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    color: AppColors.primary,
+  );
+  static const title = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    color: AppColors.blackColor,
+    letterSpacing: -0.3,
+  );
+  
+  static const bottomNavInactiveIcon = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textGrey,
+  );
+
   static const bottomNavActiveLabel = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w500,

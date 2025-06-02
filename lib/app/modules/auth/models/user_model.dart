@@ -1,74 +1,51 @@
-import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserModel {
-  final String userId;
-  final String userName;
-  final String name;
-  final String photoPath;
-  final String roleId;
-  final String siteId;
-  final String companyId;
-  final String? deviceToken;
-  final String? deviceId;
-  final String? email;
+class Student {
+  final String uid;
+  final String fullName;
+  final String email;
+  final String phone;
+  final String department;
+  final String rollNumber;
+  final bool isEmailVerified;
+  final bool profileComplete;
 
-  UserModel({
-    required this.userId,
-    required this.userName,
-    required this.name,
-    required this.photoPath,
-    required this.roleId,
-    required this.siteId,
-    required this.companyId,
-    this.deviceToken,
-    this.deviceId,
-    this.email,
+  Student({
+    required this.uid,
+    required this.fullName,
+    required this.email,
+    required this.phone,
+    required this.department,
+    required this.rollNumber,
+    this.isEmailVerified = false,
+    this.profileComplete = true,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      userId: json['userID'] ?? '',
-      userName: json['userName'] ?? '',
-      name: json['name'] ?? '',
-      photoPath: json['photoPath'] ?? '',
-      roleId: json['roleID'] ?? '',
-      siteId: json['siteId'] ?? '',
-      companyId: json['companyId'] ?? '',
-      deviceToken: json['deviceToken'],
-      deviceId: json['deviceID'],
-      email: json['email'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      'userID': userId,
-      'userName': userName,
-      'name': name,
-      'photoPath': photoPath,
-      'roleID': roleId,
-      'siteId': siteId,
-      'companyId': companyId,
-      'deviceToken': deviceToken,
-      'deviceID': deviceId,
+      'uid': uid,
+      'fullName': fullName,
       'email': email,
+      'phone': phone,
+      'department': department,
+      'rollNumber': rollNumber,
+      'isEmailVerified': isEmailVerified,
+      'profileComplete': profileComplete,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
     };
   }
 
-  // Convert user model to JSON string for storage
-  String toJsonString() {
-    return jsonEncode(toJson());
-  }
-
-  // Create user model from JSON string from storage
-  static UserModel? fromJsonString(String? jsonString) {
-    if (jsonString == null || jsonString.isEmpty) return null;
-    try {
-      final Map<String, dynamic> json = jsonDecode(jsonString);
-      return UserModel.fromJson(json);
-    } catch (e) {
-      print('Error parsing user data: $e');
-      return null;
-    }
+  factory Student.fromMap(Map<String, dynamic> map) {
+    return Student(
+      uid: map['uid'],
+      fullName: map['fullName'],
+      email: map['email'],
+      phone: map['phone'],
+      department: map['department'],
+      rollNumber: map['rollNumber'],
+      isEmailVerified: map['isEmailVerified'] ?? false,
+      profileComplete: map['profileComplete'] ?? true,
+    );
   }
 }

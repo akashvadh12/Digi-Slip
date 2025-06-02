@@ -1,4 +1,3 @@
-
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/core/theme/app_text_styles.dart';
 import 'package:digislips/app/modules/auth/controllers/registration_controller.dart';
@@ -26,11 +25,14 @@ class StudentRegistrationScreen extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(24, 20, 24, 40),
               child: Column(
                 children: [
-                  Text('Student Registration', style: AppTextStyles.hint),
+                  Text(
+                    'Student Registration',
+                    style: AppTextStyles.welcomeTitle,
+                  ),
                   SizedBox(height: 8),
                   Text(
                     'Join our academic community',
-                    style: AppTextStyles.subtitle,
+                    style: AppTextStyles.welcomeTitle,
                   ),
                 ],
               ),
@@ -86,9 +88,19 @@ class StudentRegistrationScreen extends StatelessWidget {
                         SizedBox(height: 20),
 
                         _buildInputField(
-                          label: 'Email or Phone',
-                          controller: controller.emailPhoneController,
-                          hintText: 'Enter email or phone number',
+                          label: 'Email',
+                          controller: controller.emailController,
+                          hintText: 'Enter your email address',
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+
+                        SizedBox(height: 20),
+
+                        _buildInputField(
+                          label: 'Phone Number',
+                          controller: controller.phoneController,
+                          hintText: 'Enter your phone number',
+                          keyboardType: TextInputType.phone,
                         ),
 
                         SizedBox(height: 20),
@@ -151,6 +163,81 @@ class StudentRegistrationScreen extends StatelessWidget {
                           hintText: 'Enter your roll number',
                         ),
 
+                        SizedBox(height: 20),
+
+                        // Password Field
+                        Obx(
+                          () => _buildPasswordField(
+                            label: 'Password',
+                            controller: controller.passwordController,
+                            hintText: 'Create a strong password',
+                            isObscured: controller.isPasswordHidden.value,
+                            onToggleVisibility: controller.togglePasswordVisibility,
+                          ),
+                        ),
+
+                        SizedBox(height: 20),
+
+                        // Confirm Password Field
+                        Obx(
+                          () => _buildPasswordField(
+                            label: 'Confirm Password',
+                            controller: controller.confirmPasswordController,
+                            hintText: 'Re-enter your password',
+                            isObscured: controller.isConfirmPasswordHidden.value,
+                            onToggleVisibility: controller.toggleConfirmPasswordVisibility,
+                          ),
+                        ),
+
+                        SizedBox(height: 20),
+
+                        // Password Requirements
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.primary.withOpacity(0.1),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Password Requirements:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Obx(() => _buildPasswordRequirement(
+                                'At least 8 characters',
+                                controller.hasMinLength.value,
+                              )),
+                              Obx(() => _buildPasswordRequirement(
+                                'At least one uppercase letter',
+                                controller.hasUppercase.value,
+                              )),
+                              Obx(() => _buildPasswordRequirement(
+                                'At least one lowercase letter',
+                                controller.hasLowercase.value,
+                              )),
+                              Obx(() => _buildPasswordRequirement(
+                                'At least one number',
+                                controller.hasNumber.value,
+                              )),
+                              Obx(() => _buildPasswordRequirement(
+                                'At least one special character',
+                                controller.hasSpecialChar.value,
+                              )),
+                            ],
+                          ),
+                        ),
+
                         SizedBox(height: 40),
 
                         // Register Button
@@ -195,8 +282,7 @@ class StudentRegistrationScreen extends StatelessWidget {
                         // Sign In Link
                         TextButton(
                           onPressed: () {
-                            // Navigate to sign in
-                            Get.snackbar('Info', 'Navigate to Sign In screen');
+                            Get.toNamed('/login');
                           },
                           child: Text(
                             'Already registered? Sign in',
@@ -210,7 +296,7 @@ class StudentRegistrationScreen extends StatelessWidget {
 
                         SizedBox(height: 30),
 
-                        // Bottom Indicator (like in the image)
+                        // Bottom Indicator
                         Container(
                           width: 134,
                           height: 5,
@@ -237,6 +323,7 @@ class StudentRegistrationScreen extends StatelessWidget {
     required String label,
     required TextEditingController controller,
     required String hintText,
+    TextInputType? keyboardType,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,6 +334,7 @@ class StudentRegistrationScreen extends StatelessWidget {
           width: double.infinity,
           child: TextField(
             controller: controller,
+            keyboardType: keyboardType,
             style: TextStyle(
               fontSize: 16,
               color: Colors.black,
@@ -277,6 +365,87 @@ class StudentRegistrationScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPasswordField({
+    required String label,
+    required TextEditingController controller,
+    required String hintText,
+    required bool isObscured,
+    required VoidCallback onToggleVisibility,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppTextStyles.label),
+        SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          child: TextField(
+            controller: controller,
+            obscureText: isObscured,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+            ),
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: AppTextStyles.hint,
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  isObscured ? Icons.visibility_off : Icons.visibility,
+                  color: AppColors.primary,
+                ),
+                onPressed: onToggleVisibility,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.lightGrey, width: 1),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.lightGrey, width: 1),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.primary, width: 2),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordRequirement(String text, bool isMet) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 4),
+      child: Row(
+        children: [
+          Icon(
+            isMet ? Icons.check_circle : Icons.circle_outlined,
+            size: 16,
+            color: isMet ? Colors.green : Colors.grey,
+          ),
+          SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              color: isMet ? Colors.green : Colors.grey,
+              fontWeight: isMet ? FontWeight.w500 : FontWeight.w400,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
