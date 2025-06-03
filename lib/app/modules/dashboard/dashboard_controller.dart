@@ -52,12 +52,14 @@ class LeaveApplication {
 
     // Format date range
     String dateRange;
-    if (leave.fromDate.day == leave.toDate.day && 
-        leave.fromDate.month == leave.toDate.month && 
+    if (leave.fromDate.day == leave.toDate.day &&
+        leave.fromDate.month == leave.toDate.month &&
         leave.fromDate.year == leave.toDate.year) {
-      dateRange = '${leave.fromDate.day}/${leave.fromDate.month}/${leave.fromDate.year}';
+      dateRange =
+          '${leave.fromDate.day}/${leave.fromDate.month}/${leave.fromDate.year}';
     } else {
-      dateRange = '${leave.fromDate.day}/${leave.fromDate.month} - ${leave.toDate.day}/${leave.toDate.month}/${leave.toDate.year}';
+      dateRange =
+          '${leave.fromDate.day}/${leave.fromDate.month} - ${leave.toDate.day}/${leave.toDate.month}/${leave.toDate.year}';
     }
 
     return LeaveApplication(
@@ -76,13 +78,13 @@ class HomeController extends GetxController {
   var isLoading = true.obs;
   var isLoadingLeaves = false.obs;
   var student = Rxn<Student>();
-  
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final LeaveService _leaveService = LeaveService();
 
   // Updated to use reactive list
   final recentLeaveApplications = <LeaveApplication>[].obs;
-  
+
   // Stream subscription for leave applications
   StreamSubscription? _leaveSubscription;
 
@@ -101,11 +103,11 @@ class HomeController extends GetxController {
   Future<void> fetchStudentData() async {
     try {
       isLoading.value = true;
-      
+
       // Get UID from SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       final uid = prefs.getString('uid');
-      
+
       if (uid == null) {
         Get.snackbar(
           'Error',
@@ -118,8 +120,11 @@ class HomeController extends GetxController {
       }
 
       // Fetch student data from Firestore
-      final docSnapshot = await _firestore.collection('students').doc(uid).get();
-      
+      final docSnapshot = await _firestore
+          .collection('students')
+          .doc(uid)
+          .get();
+
       if (docSnapshot.exists) {
         student.value = Student.fromMap(docSnapshot.data()!);
         // Fetch leave applications after student data is loaded
@@ -150,34 +155,36 @@ class HomeController extends GetxController {
   void _fetchRecentLeaveApplications(String uid) {
     try {
       isLoadingLeaves.value = true;
-      
+
       // Cancel previous subscription if exists
       _leaveSubscription?.cancel();
-      
+
       // Listen to user's leave applications
-      _leaveSubscription = _leaveService.getUserLeaveApplications(uid).listen(
-        (leaveModels) {
-          // Convert LeaveModel to LeaveApplication and take only recent 5
-          final applications = leaveModels
-              .take(5) // Get only the first 5 (most recent)
-              .map((leave) => LeaveApplication.fromLeaveModel(leave))
-              .toList();
-          
-          recentLeaveApplications.assignAll(applications);
-          isLoadingLeaves.value = false;
-        },
-        onError: (error) {
-          print('Error fetching leave applications: $error');
-          Get.snackbar(
-            'Error',
-            'Failed to load leave applications: $error',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
+      _leaveSubscription = _leaveService
+          .getUserLeaveApplications(uid)
+          .listen(
+            (leaveModels) {
+              // Convert LeaveModel to LeaveApplication and take only recent 5
+              final applications = leaveModels
+                  .take(5) // Get only the first 5 (most recent)
+                  .map((leave) => LeaveApplication.fromLeaveModel(leave))
+                  .toList();
+
+              recentLeaveApplications.assignAll(applications);
+              isLoadingLeaves.value = false;
+            },
+            onError: (error) {
+              print('Error fetching leave applications: $error');
+              Get.snackbar(
+                'Error',
+                'Failed to load leave applications: $error',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.red,
+                colorText: Colors.white,
+              );
+              isLoadingLeaves.value = false;
+            },
           );
-          isLoadingLeaves.value = false;
-        },
-      );
     } catch (e) {
       print('Error setting up leave applications stream: $e');
       isLoadingLeaves.value = false;
@@ -193,7 +200,7 @@ class HomeController extends GetxController {
   Future<void> refreshLeaveApplications() async {
     final prefs = await SharedPreferences.getInstance();
     final uid = prefs.getString('uid');
-    
+
     if (uid != null) {
       _fetchRecentLeaveApplications(uid);
     }
@@ -205,11 +212,11 @@ class HomeController extends GetxController {
 
   void onApplyForLeave() {
     Get.to(ApplyLeaveView());
-    Get.snackbar(
-      'Apply for Leave',
-      'Navigate to leave application form',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    // Get.snackbar(
+    //   'Apply for Leave',
+    //   'Navigate to leave application form',
+    //   snackPosition: SnackPosition.BOTTOM,
+    // );
   }
 
   void onViewLeaveStatus() {
@@ -234,15 +241,15 @@ class HomeController extends GetxController {
     try {
       // Cancel leave applications subscription
       _leaveSubscription?.cancel();
-      
+
       // Clear SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
-      
+
       // Clear student data and leave applications
       student.value = null;
       recentLeaveApplications.clear();
-      
+
       Get.to(LogoutPage());
       Get.snackbar(
         'Logout',

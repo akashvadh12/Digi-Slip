@@ -125,22 +125,7 @@ class LeaveController extends GetxController {
         .toList();
   }
 
-  Future<void> addLeaveRequest(LeaveModel request) async {
-    if (currentUserId.value.isEmpty) {
-      Get.snackbar('Error', 'User not authenticated');
-      return;
-    }
-
-    try {
-      isLoading.value = true;
-      await _leaveService.createLeaveApplication(currentUserId.value, request);
-      Get.snackbar('Success', 'Leave request submitted successfully');
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to submit leave request: $e');
-    } finally {
-      isLoading.value = false;
-    }
-  }
+  
 
   Future<void> updateLeaveStatus(String leaveId, String status, {String? reviewComments}) async {
     if (currentUserId.value.isEmpty) {

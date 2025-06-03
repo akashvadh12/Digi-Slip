@@ -18,8 +18,7 @@ class ProfileController extends GetxController {
   // Firestore and Storage instances
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final ImagePicker _imagePicker = ImagePicker();
-
+ 
   // Observable student data
   var student = Rxn<Student>();
 
@@ -33,6 +32,8 @@ class ProfileController extends GetxController {
   // Edit form controllers
   final fullNameController = TextEditingController();
   final phoneController = TextEditingController();
+  final parentPhoneController = TextEditingController();
+  final parentEmailController = TextEditingController();
   final departmentController = TextEditingController();
   var selectedSemester = '1st Semester'.obs;
 
@@ -67,6 +68,8 @@ class ProfileController extends GetxController {
   String get studentId => student.value?.rollNumber ?? 'Loading...';
   String get email => student.value?.email ?? 'Loading...';
   String get phone => student.value?.phone ?? 'Loading...';
+  String get parentPhone => student.value?.parentPhone ?? 'Not provided';
+  String get parentEmail => student.value?.parentEmail ?? 'Not provided';
   String get semester => student.value?.semester ?? '1st Semester';
   String? get profileImageUrl => student.value?.profileImageUrl;
 
@@ -80,6 +83,8 @@ class ProfileController extends GetxController {
   void onClose() {
     fullNameController.dispose();
     phoneController.dispose();
+    parentPhoneController.dispose();
+    parentEmailController.dispose();
     departmentController.dispose();
     super.onClose();
   }
@@ -139,6 +144,8 @@ class ProfileController extends GetxController {
     if (student.value != null) {
       fullNameController.text = student.value!.fullName;
       phoneController.text = student.value!.phone;
+      parentPhoneController.text = student.value!.parentPhone ?? '';
+      parentEmailController.text = student.value!.parentEmail ?? '';
       departmentController.text = student.value!.department;
       selectedSemester.value = student.value!.semester;
     }
@@ -161,6 +168,16 @@ class ProfileController extends GetxController {
     _populateEditControllers(); // Reset to original values
   }
 
+  // Validate email format
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  // Validate phone number format (basic validation)
+  bool _isValidPhone(String phone) {
+    return RegExp(r'^\+?[\d\s\-\(\)]{10,}$').hasMatch(phone);
+  }
+
   // Save profile changes
   Future<void> saveProfileChanges() async {
     if (student.value == null) return;
@@ -176,12 +193,39 @@ class ProfileController extends GetxController {
 
       if (phoneController.text.trim().isEmpty) {
         _showErrorSnackbar('Validation Error', 'Phone number is required');
+        return;
+      }
+
+      // Validate phone number format
+      if (!_isValidPhone(phoneController.text.trim())) {
+        _showErrorSnackbar('Validation Error', 'Please enter a valid phone number');
+        return;
+      }
+
+      // Validate parent phone if provided
+      if (parentPhoneController.text.trim().isNotEmpty && 
+          !_isValidPhone(parentPhoneController.text.trim())) {
+        _showErrorSnackbar('Validation Error', 'Please enter a valid parent phone number');
+        return;
+      }
+
+      // Validate parent email if provided
+      if (parentEmailController.text.trim().isNotEmpty && 
+          !_isValidEmail(parentEmailController.text.trim())) {
+        _showErrorSnackbar('Validation Error', 'Please enter a valid parent email address');
+        return;
       }
 
       // Create updated student object
       final updatedStudent = student.value!.copyWith(
         fullName: fullNameController.text.trim(),
         phone: phoneController.text.trim(),
+        parentPhone: parentPhoneController.text.trim().isEmpty 
+            ? null 
+            : parentPhoneController.text.trim(),
+        parentEmail: parentEmailController.text.trim().isEmpty 
+            ? null 
+            : parentEmailController.text.trim(),
         department: departmentController.text.trim().isEmpty
             ? selectedSemester.value
             : departmentController.text.trim(),
@@ -190,6 +234,8 @@ class ProfileController extends GetxController {
 
       await updateStudentData(updatedStudent);
       isEditingProfile.value = false;
+      
+      _showSuccessSnackbar('Success', 'Profile updated successfully!');
     } catch (e) {
       print('Error saving profile changes: $e');
       _showErrorSnackbar('Error', 'Failed to save changes: ${e.toString()}');
@@ -210,7 +256,6 @@ class ProfileController extends GetxController {
           .update(dataToUpdate);
 
       student.value = updatedStudent;
-      _showSuccessSnackbar('Success', 'Profile updated successfully!');
     } catch (e) {
       print('Error updating student data: $e');
       _showErrorSnackbar('Error', 'Failed to update profile: ${e.toString()}');
@@ -218,170 +263,40 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Show image source selection dialog
-  void showImageSourceDialog() {
-    Get.dialog(
-      AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Select Image Source', style: AppTextStyles.title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.camera_alt, color: AppColors.primary),
-              title: Text('Camera', style: AppTextStyles.body),
-              onTap: () {
-                Get.back();
-                pickImageFromCamera();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.photo_library, color: AppColors.secondary),
-              title: Text('Gallery', style: AppTextStyles.body),
-              onTap: () {
-                Get.back();
-                pickImageFromGallery();
-              },
-            ),
-            if (student.value?.profileImageUrl != null)
-              ListTile(
-                leading: Icon(Icons.delete, color: AppColors.error),
-                title: Text('Remove Photo', style: AppTextStyles.body),
-                onTap: () {
-                  Get.back();
-                  removeProfileImage();
-                },
-              ),
-          ],
-        ),
-      ),
-    );
-  } // Pick image from camera
+  // Update only parent information
+  Future<void> updateParentInfo({
+    required String parentPhone,
+    required String parentEmail,
+  }) async {
+    if (student.value == null) return;
 
-  Future<void> pickImageFromCamera() async {
     try {
-      final cameraStatus = await Permission.camera.request();
-      if (!cameraStatus.isGranted) {
-        _showErrorSnackbar(
-          'Permission Denied',
-          'Camera permission is required',
-        );
+      isLoading.value = true;
+
+      // Validate parent phone if provided
+      if (parentPhone.trim().isNotEmpty && !_isValidPhone(parentPhone.trim())) {
+        _showErrorSnackbar('Validation Error', 'Please enter a valid parent phone number');
         return;
       }
 
-      final XFile? image = await _imagePicker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
-      );
-
-      if (image != null) {
-        await uploadProfileImage(File(image.path));
+      // Validate parent email if provided
+      if (parentEmail.trim().isNotEmpty && !_isValidEmail(parentEmail.trim())) {
+        _showErrorSnackbar('Validation Error', 'Please enter a valid parent email address');
+        return;
       }
-    } catch (e) {
-      print('Error picking image from camera: $e');
-      _showErrorSnackbar('Error', 'Failed to capture image: ${e.toString()}');
-    }
-  }
 
-  // Pick image from gallery
-  Future<void> pickImageFromGallery() async {
-    try {
-      final XFile? image = await _imagePicker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
-      );
-
-      if (image != null) {
-        await uploadProfileImage(File(image.path));
-      }
-    } catch (e) {
-      print('Error picking image from gallery: $e');
-      _showErrorSnackbar('Error', 'Failed to select image: ${e.toString()}');
-    }
-  }
-
-  // Upload profile image to Firebase Storage and update Realtime Database
-  Future<void> uploadProfileImage(File imageFile) async {
-    if (student.value == null || student.value!.uid.isEmpty) {
-      _showErrorSnackbar('Error', 'User data not found');
-      return;
-    }
-
-    try {
-      isUploadingImage.value = true;
-
-      final String fileName =
-          'profile_${student.value!.uid}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final Reference storageRef = _storage.ref().child(
-        'profile_images/$fileName',
-      );
-
-      final UploadTask uploadTask = storageRef.putFile(imageFile);
-      final TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
-
-      final String downloadURL = await snapshot.ref.getDownloadURL();
-
-      // Save the image URL to Realtime Database under user's node
-      final DatabaseReference dbRef = FirebaseDatabase.instance.ref().child(
-        'profile_images/${student.value!.uid}',
-      );
-      await dbRef.set(downloadURL);
-
-      // Optionally update local student model with new URL
       final updatedStudent = student.value!.copyWith(
-        profileImageUrl: downloadURL,
+        parentPhone: parentPhone.trim().isEmpty ? null : parentPhone.trim(),
+        parentEmail: parentEmail.trim().isEmpty ? null : parentEmail.trim(),
       );
-      student.value = updatedStudent;
 
-      _showSuccessSnackbar('Success', 'Profile image updated successfully!');
+      await updateStudentData(updatedStudent);
+      _showSuccessSnackbar('Success', 'Parent information updated successfully!');
     } catch (e) {
-      print('Error uploading profile image: $e');
-      _showErrorSnackbar('Error', 'Failed to upload image: ${e.toString()}');
+      print('Error updating parent info: $e');
+      _showErrorSnackbar('Error', 'Failed to update parent information: ${e.toString()}');
     } finally {
-      isUploadingImage.value = false;
-    }
-  }
-
-  // Remove profile image from Firebase Storage and Realtime Database
-  Future<void> removeProfileImage() async {
-    if (student.value == null || student.value!.profileImageUrl == null) {
-      _showErrorSnackbar('Error', 'No profile image to remove');
-      return;
-    }
-
-    try {
-      isUploadingImage.value = true;
-
-      try {
-        final Reference imageRef = _storage.refFromURL(
-          student.value!.profileImageUrl!,
-        );
-        await imageRef.delete();
-      } catch (e) {
-        print('Error deleting image from storage: $e');
-        // Continue even if deletion fails
-      }
-
-      // Remove image URL from Realtime Database
-      final DatabaseReference dbRef = FirebaseDatabase.instance.ref().child(
-        'profile_images/${student.value!.uid}',
-      );
-      await dbRef.remove();
-
-      // Update local student model
-      final updatedStudent = student.value!.copyWith(profileImageUrl: null);
-      student.value = updatedStudent;
-
-      _showSuccessSnackbar('Success', 'Profile image removed successfully!');
-    } catch (e) {
-      print('Error removing profile image: $e');
-      _showErrorSnackbar('Error', 'Failed to remove image: ${e.toString()}');
-    } finally {
-      isUploadingImage.value = false;
+      isLoading.value = false;
     }
   }
 

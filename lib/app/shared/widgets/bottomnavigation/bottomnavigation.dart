@@ -20,48 +20,51 @@ class BottomNavBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Scaffold(
-          body: screens[controller.selectedIndex.value],
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, -5),
-                ),
-              ],
-            ),
-            child: BottomNavigationBar(
-              currentIndex: controller.selectedIndex.value,
-              onTap: controller.changeBottomNavIndex,
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Colors.white,
-              selectedItemColor: AppColors.primary,
-              unselectedItemColor: AppColors.textGrey,
-              selectedLabelStyle:
-                  AppTextStyles.bottomNavActiveLabel?.copyWith(fontWeight: FontWeight.w600),
-              unselectedLabelStyle: AppTextStyles.bottomNavLabel,
-              elevation: 0,
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home_outlined, size: 24),
-                  activeIcon: Icon(Icons.home, size: 24),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.notifications_outlined, size: 24),
-                  activeIcon: Icon(Icons.notifications, size: 24),
-                  label: 'Notifications',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.settings_outlined, size: 24),
-                  activeIcon: Icon(Icons.settings, size: 24),
-                  label: 'Settings',
-                ),
-              ],
-            ),
+    return Obx(
+      () => Scaffold(
+        body: screens[controller.selectedIndex.value],
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
           ),
-        ));
+          child: BottomNavigationBar(
+            currentIndex: controller.selectedIndex.value,
+            onTap: controller.changeBottomNavIndex,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.white,
+            selectedItemColor: AppColors.primary,
+            unselectedItemColor: AppColors.textGrey,
+            selectedLabelStyle: AppTextStyles.bottomNavActiveLabel?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            unselectedLabelStyle: AppTextStyles.bottomNavLabel,
+            elevation: 0,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined, size: 24),
+                activeIcon: Icon(Icons.home, size: 24),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.notifications_outlined, size: 24),
+                activeIcon: Icon(Icons.notifications, size: 24),
+                label: 'Notifications',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.settings_outlined, size: 24),
+                activeIcon: Icon(Icons.settings, size: 24),
+                label: 'Settings',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -183,25 +183,6 @@ class LeaveRequestsScreen extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: AppColors.primaryGradient,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary,
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: FloatingActionButton(
-          onPressed: () => _showAddLeaveDialog(context),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: const Icon(Icons.add, color: AppColors.whiteColor, size: 28),
-        ),
-      ),
     );
   }
 
@@ -377,10 +358,7 @@ class LeaveRequestsScreen extends StatelessWidget {
               ],
               if (request.reviewedBy != null) ...[
                 const SizedBox(height: 16),
-                _buildDetailRow(
-                  'Reviewed By',
-                  request.reviewedBy!,
-                ),
+                _buildDetailRow('Reviewed By', request.reviewedBy!),
               ],
               const SizedBox(height: 16),
               Column(
@@ -401,16 +379,19 @@ class LeaveRequestsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              if (request.reviewComments != null && request.reviewComments!.isNotEmpty) ...[
+              if (request.reviewComments != null &&
+                  request.reviewComments!.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      request.status.toLowerCase() == 'rejected' ? 'Rejection Reason' : 'Review Comments',
+                      request.status.toLowerCase() == 'rejected'
+                          ? 'Rejection Reason'
+                          : 'Review Comments',
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: request.status.toLowerCase() == 'rejected' 
-                            ? AppColors.rejectedColor 
+                        color: request.status.toLowerCase() == 'rejected'
+                            ? AppColors.rejectedColor
                             : AppColors.greyColor,
                       ),
                     ),
@@ -495,288 +476,6 @@ class LeaveRequestsScreen extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  void _showAddLeaveDialog(BuildContext context) {
-    final leaveController = Get.find<LeaveController>();
-    final reasonController = TextEditingController();
-    final startDate = Rx<DateTime?>(null);
-    final endDate = Rx<DateTime?>(null);
-    final selectedType = RxString('');
-
-    final leaveTypes = [
-      'Sick Leave',
-      'Vacation Leave',
-      'Personal Leave',
-      'Family Emergency',
-      'Medical Leave',
-    ];
-
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: AppColors.cardBackground,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'New Leave Request',
-                  style: AppTextStyles.title.copyWith(fontSize: 20),
-                ),
-                const SizedBox(height: 24),
-
-                // Leave Type Dropdown
-                Text('Leave Type', style: AppTextStyles.bodyMedium),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.borderColor),
-                    borderRadius: BorderRadius.circular(12),
-                    color: AppColors.lightGrey,
-                  ),
-                  child: Obx(
-                    () => DropdownButton<String>(
-                      value: selectedType.value.isEmpty
-                          ? null
-                          : selectedType.value,
-                      hint: const Text('Select leave type'),
-                      isExpanded: true,
-                      underline: const SizedBox(),
-                      items: leaveTypes
-                          .map(
-                            (type) => DropdownMenuItem(
-                              value: type,
-                              child: Text(type),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        selectedType.value = value ?? '';
-                      },
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Date Selection
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Start Date', style: AppTextStyles.bodyMedium),
-                          const SizedBox(height: 8),
-                          Obx(
-                            () => InkWell(
-                              onTap: () async {
-                                final date = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime.now(),
-                                  lastDate: DateTime.now().add(
-                                    const Duration(days: 365),
-                                  ),
-                                );
-                                if (date != null) startDate.value = date;
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: AppColors.borderColor,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: AppColors.lightGrey,
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.calendar_today, size: 16),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      startDate.value != null
-                                          ? DateFormat('MMM dd, yyyy').format(startDate.value!)
-                                          : 'Select',
-                                      style: AppTextStyles.body,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('End Date', style: AppTextStyles.bodyMedium),
-                          const SizedBox(height: 8),
-                          Obx(
-                            () => InkWell(
-                              onTap: () async {
-                                final date = await showDatePicker(
-                                  context: context,
-                                  initialDate: startDate.value ?? DateTime.now(),
-                                  firstDate: startDate.value ?? DateTime.now(),
-                                  lastDate: DateTime.now().add(
-                                    const Duration(days: 365),
-                                  ),
-                                );
-                                if (date != null) endDate.value = date;
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: AppColors.borderColor,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: AppColors.lightGrey,
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.calendar_today, size: 16),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      endDate.value != null
-                                          ? DateFormat('MMM dd, yyyy').format(endDate.value!)
-                                          : 'Select',
-                                      style: AppTextStyles.body,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // Reason
-                Text('Reason', style: AppTextStyles.bodyMedium),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: reasonController,
-                  decoration: InputDecoration(
-                    hintText: 'Explain the reason for your leave',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppColors.borderColor,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppColors.borderColor,
-                      ),
-                    ),
-                    fillColor: AppColors.lightGrey,
-                    filled: true,
-                  ),
-                  maxLines: 3,
-                ),
-
-                const SizedBox(height: 24),
-
-                // Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Get.back(),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: const BorderSide(color: AppColors.borderColor),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text('Cancel'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (selectedType.value.isNotEmpty &&
-                              reasonController.text.isNotEmpty &&
-                              startDate.value != null &&
-                              endDate.value != null) {
-                            
-                            // Check for overlapping leave
-                            final hasOverlap = await leaveController.checkOverlappingLeave(
-                              fromDate: startDate.value!,
-                              toDate: endDate.value!,
-                            );
-
-                            if (hasOverlap) {
-                              Get.snackbar(
-                                'Error',
-                                'You already have a leave request for the selected dates',
-                                backgroundColor: AppColors.error.withOpacity(0.1),
-                                colorText: AppColors.error,
-                              );
-                              return;
-                            }
-
-                            final totalDays = endDate.value!.difference(startDate.value!).inDays + 1;
-                            
-                            final request = LeaveModel(
-                              id: DateTime.now().millisecondsSinceEpoch.toString(),
-                              leaveType: selectedType.value,
-                              fromDate: startDate.value!,
-                              toDate: endDate.value!,
-                              totalDays: totalDays,
-                              reason: reasonController.text,
-                              status: 'Pending',
-                              submittedAt: DateTime.now(),
-                              submittedBy: leaveController.currentUserId.value,
-                            );
-                            
-                            await leaveController.addLeaveRequest(request);
-                            Get.back();
-                          } else {
-                            Get.snackbar(
-                              'Error',
-                              'Please fill all required fields',
-                              backgroundColor: AppColors.error.withOpacity(0.1),
-                              colorText: AppColors.error,
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: const Text(
-                          'Submit Request',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

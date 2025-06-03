@@ -46,6 +46,10 @@ dependencies:
   dio: ^5.2.0
   firebase_storage: ^12.4.6
   notification_listener_service: ^0.3.4
+  firebase_messaging: ^15.2.6
+  flutter_local_notifications: ^19.2.1
+  http: ^1.4.0
+  icons_launcher: ^3.0.1
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -66,10 +70,17 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/images/education_logo.png
+
+icons_launcher:
+  image_path: "assets/images/education_logo.png"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
 
   # To add assets to your application, add an assets section, like this:
   # assets:

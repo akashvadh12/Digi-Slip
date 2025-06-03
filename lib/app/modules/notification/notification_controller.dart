@@ -1,33 +1,8 @@
-// notification_controller.dart
 import 'dart:async';
 import 'package:digislips/app/modules/notification/notification_model.dart';
+import 'package:digislips/app/modules/notification/notification_service/notification_service.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-// TODO: Replace this with the actual implementation or import if it exists elsewhere.
-class NotificationService {
-  Stream<List<NotificationModel>> getUserNotifications(String userId) => Stream.value([]);
-  Stream<int> getUnreadNotificationCount(String userId) => Stream.value(0);
-  Future<void> markAsRead(String userId, String notificationId) async {}
-  Future<void> markAllAsRead(String userId) async {}
-  Future<void> deleteNotification(String userId, String notificationId) async {}
-  Future<void> deleteOldNotifications(String userId) async {}
-  Future<void> createNotification({
-    required String userId,
-    required String title,
-    required String description,
-    required NotificationType type,
-    Map<String, dynamic>? metadata,
-  }) async {}
-  Future<void> createLeaveStatusNotification({
-    required String userId,
-    required String status,
-    required String leaveId,
-    required DateTime fromDate,
-    required DateTime toDate,
-    String? reviewComments,
-  }) async {}
-}
 
 class NotificationsController extends GetxController {
   final NotificationService _notificationService = NotificationService();
@@ -55,12 +30,21 @@ class NotificationsController extends GetxController {
   }
 
   Future<void> _initializeController() async {
-    await _getUserId();
-    if (_userId != null) {
-      _loadNotifications();
-      _loadUnreadCount();
-    } else {
-      errorMessage.value = 'User not found. Please login again.';
+    try {
+      // Initialize Firebase messaging
+      await _notificationService.initialize();
+      
+      // Get user ID and load notifications
+      await _getUserId();
+      if (_userId != null) {
+        _loadNotifications();
+        _loadUnreadCount();
+      } else {
+        errorMessage.value = 'User not found. Please login again.';
+      }
+    } catch (e) {
+      errorMessage.value = 'Failed to initialize notifications: $e';
+      print('Error initializing notifications: $e');
     }
   }
 
@@ -86,10 +70,12 @@ class NotificationsController extends GetxController {
           (notificationList) {
             notifications.value = notificationList;
             isLoading.value = false;
+            errorMessage.value = '';
           },
           onError: (error) {
             errorMessage.value = 'Failed to load notifications: $error';
             isLoading.value = false;
+            print('Error loading notifications: $error');
           },
         );
   }
@@ -121,12 +107,23 @@ class NotificationsController extends GetxController {
         'Error',
         'Failed to mark notification as read: $e',
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
       );
     }
   }
 
   Future<void> markAllAsRead() async {
     if (_userId == null) return;
+    
+    if (!hasUnreadNotifications) {
+      Get.snackbar(
+        'Info',
+        'No unread notifications to mark',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+      );
+      return;
+    }
     
     try {
       isLoading.value = true;
@@ -136,12 +133,14 @@ class NotificationsController extends GetxController {
         'Success',
         'All notifications marked as read',
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
       );
     } catch (e) {
       Get.snackbar(
         'Error',
         'Failed to mark all notifications as read: $e',
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
       );
     } finally {
       isLoading.value = false;
@@ -157,12 +156,14 @@ class NotificationsController extends GetxController {
         'Success',
         'Notification deleted',
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
       );
     } catch (e) {
       Get.snackbar(
         'Error',
         'Failed to delete notification: $e',
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
       );
     }
   }
@@ -175,6 +176,8 @@ class NotificationsController extends GetxController {
     if (_userId != null) {
       _loadNotifications();
       _loadUnreadCount();
+    } else {
+      errorMessage.value = 'User not found. Please login again.';
     }
   }
 
@@ -182,27 +185,33 @@ class NotificationsController extends GetxController {
     if (_userId == null) return;
     
     try {
+      isLoading.value = true;
       await _notificationService.deleteOldNotifications(_userId!);
       Get.snackbar(
         'Success',
         'Old notifications cleaned up',
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
       );
     } catch (e) {
       Get.snackbar(
         'Error',
         'Failed to cleanup old notifications: $e',
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  // Helper method to create notifications (can be called from other controllers)
+  // Create notification (can be called from other controllers)
   Future<void> createNotification({
     required String title,
     required String description,
     required NotificationType type,
     Map<String, dynamic>? metadata,
+    bool sendPushNotification = true,
   }) async {
     if (_userId == null) await _getUserId();
     if (_userId == null) return;
@@ -214,13 +223,20 @@ class NotificationsController extends GetxController {
         description: description,
         type: type,
         metadata: metadata,
+        sendPushNotification: sendPushNotification,
       );
     } catch (e) {
       print('Failed to create notification: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to create notification: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
+      );
     }
   }
 
-  // Method to create leave status notification (can be called from leave controller)
+  // Create leave status notification (can be called from leave controller)
   Future<void> createLeaveStatusNotification({
     required String status,
     required String leaveId,
@@ -242,10 +258,117 @@ class NotificationsController extends GetxController {
       );
     } catch (e) {
       print('Failed to create leave status notification: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to create leave notification: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
+      );
     }
   }
 
+  // Send notification to specific user (admin function)
+  Future<void> sendNotificationToUser({
+    required String targetUserId,
+    required String title,
+    required String description,
+    required NotificationType type,
+    Map<String, dynamic>? metadata,
+  }) async {
+    try {
+      await _notificationService.createNotification(
+        userId: targetUserId,
+        title: title,
+        description: description,
+        type: type,
+        metadata: metadata,
+        sendPushNotification: true,
+      );
+      
+      Get.snackbar(
+        'Success',
+        'Notification sent successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+      );
+    } catch (e) {
+      print('Failed to send notification to user: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to send notification: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
+      );
+    }
+  }
+
+  // Retry loading notifications on error
+  Future<void> retryLoading() async {
+    errorMessage.value = '';
+    await refreshNotifications();
+  }
+
+  // Handle notification tap from push notification
+  void handleNotificationTap(Map<String, dynamic> data) {
+    final notificationId = data['notificationId'] as String?;
+    final type = data['type'] as String?;
+    
+    if (notificationId != null) {
+      // Mark notification as read
+      markAsRead(notificationId);
+    }
+    
+    // Handle navigation based on notification type
+    switch (type) {
+      case 'approved':
+      case 'rejected':
+        // Navigate to leave details if leaveId is available
+        final leaveId = data['leaveId'] as String?;
+        if (leaveId != null) {
+          // Get.toNamed('/leave-details', arguments: leaveId);
+        }
+        break;
+      case 'document':
+        // Navigate to document screen
+        final documentId = data['documentId'] as String?;
+        if (documentId != null) {
+          // Get.toNamed('/document-details', arguments: documentId);
+        }
+        break;
+      case 'comment':
+        // Navigate to comments screen
+        break;
+      default:
+        // Stay on notifications screen or navigate to home
+        break;
+    }
+  }
+
+  // Getters for UI state
   bool get hasUnreadNotifications => unreadCount.value > 0;
   bool get hasNotifications => notifications.isNotEmpty;
   bool get hasError => errorMessage.value.isNotEmpty;
+  
+  // Get notifications by type
+  List<NotificationModel> getNotificationsByType(NotificationType type) {
+    return notifications.where((notification) => notification.type == type).toList();
+  }
+  
+  // Get recent notifications (last 7 days)
+  List<NotificationModel> get recentNotifications {
+    final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7));
+    return notifications
+        .where((notification) => notification.createdAt.isAfter(sevenDaysAgo))
+        .toList();
+  }
+  
+  // Get notification statistics
+  Map<String, int> get notificationStats {
+    final stats = <String, int>{};
+    for (final notification in notifications) {
+      final typeKey = notification.type.toString().split('.').last;
+      stats[typeKey] = (stats[typeKey] ?? 0) + 1;
+    }
+    return stats;
+  }
 }
