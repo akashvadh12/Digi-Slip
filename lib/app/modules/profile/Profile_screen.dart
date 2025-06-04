@@ -13,7 +13,8 @@ class ProfileScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
+            Padding(padding: const EdgeInsets.all(8.0), child: _buildHeader()),
+
             Expanded(
               child: Container(
                 height: double.infinity,
@@ -26,7 +27,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(7.0),
+                  padding: const EdgeInsets.all(5),
                   child: Obx(() {
                     if (controller.isLoading.value &&
                         controller.student.value == null) {
@@ -273,6 +274,7 @@ class ProfileScreen extends StatelessWidget {
         // Personal & Contact Information Card
         _buildInfoCard(
           title: 'Personal & Contact Information',
+          
           icon: Icons.person_outline,
           children: [
             _buildInfoRow(
@@ -452,18 +454,18 @@ class ProfileScreen extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(12),
+                padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: AppColors.primary, size: 24),
               ),
-              SizedBox(width: 16),
+              SizedBox(width: 7),
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: AppColors.blackColor,
                 ),
@@ -652,13 +654,13 @@ class ProfileScreen extends StatelessWidget {
                 : () {},
             color: AppColors.primary,
           ),
-          SizedBox(height: 12),
-          _buildActionButton(
-            icon: Icons.lock_outline,
-            label: 'Change Password',
-            onTap: controller.changePassword,
-            color: AppColors.secondary,
-          ),
+          // SizedBox(height: 12),
+          // _buildActionButton(
+          //   icon: Icons.lock_outline,
+          //   label: 'Change Password',
+          //   onTap: controller.changePassword,
+          //   color: AppColors.secondary,
+          // ),
           SizedBox(height: 12),
           _buildActionButton(
             icon: Icons.logout_outlined,

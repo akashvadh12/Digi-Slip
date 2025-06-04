@@ -14,7 +14,7 @@ class BottomNavBarWidget extends StatelessWidget {
 
   final List<Widget> screens = [
     HomeView(),
-    NotificationsScreen(),
+    NotificationScreen(),
     SettingsScreen(),
   ];
 

@@ -338,11 +338,11 @@ class RegistrationController extends GetxController {
 
     if (firstError != null) {
       Get.snackbar(
-        'Validation Error',
+        'Required fields are missing',
         firstError,
         backgroundColor: AppColors.error,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
       );

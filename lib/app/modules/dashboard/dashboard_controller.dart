@@ -221,20 +221,20 @@ class HomeController extends GetxController {
 
   void onViewLeaveStatus() {
     Get.to(LeaveRequestsScreen());
-    Get.snackbar(
-      'Leave Status',
-      'Navigate to leave status page',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    // Get.snackbar(
+    //   'Leave Status',
+    //   'Navigate to leave status page',
+    //   snackPosition: SnackPosition.BOTTOM,
+    // );
   }
 
   void onMyProfile() {
     Get.to(ProfileScreen());
-    Get.snackbar(
-      'My Profile',
-      'Navigate to profile page',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    // Get.snackbar(
+    //   'My Profile',
+    //   'Navigate to profile page',
+    //   snackPosition: SnackPosition.BOTTOM,
+    // );
   }
 
   void onLogout() async {
@@ -251,11 +251,11 @@ class HomeController extends GetxController {
       recentLeaveApplications.clear();
 
       Get.to(LogoutPage());
-      Get.snackbar(
-        'Logout',
-        'Logging out...',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Get.snackbar(
+      //   'Logout',
+      //   'Logging out...',
+      //   snackPosition: SnackPosition.BOTTOM,
+      // );
     } catch (e) {
       Get.snackbar(
         'Error',

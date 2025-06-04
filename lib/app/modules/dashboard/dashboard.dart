@@ -20,7 +20,7 @@ class HomeView extends GetView<HomeController> {
             // Enhanced Header with gradient and better spacing
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
+              padding: const EdgeInsets.fromLTRB(20, 20, 24, 30),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -55,22 +55,24 @@ class HomeView extends GetView<HomeController> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Obx(() => Text(
-                            controller.isLoading.value 
-                              ? 'Loading...' 
-                              : controller.studentName,
-                            style: AppTextStyles.welcomeTitle.copyWith(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                          Obx(
+                            () => Text(
+                              controller.isLoading.value
+                                  ? 'Loading...'
+                                  : controller.studentName,
+                              style: AppTextStyles.welcomeTitle.copyWith(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          )),
+                          ),
                         ],
                       ),
                       // Notification Bell with badge
                       Stack(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(16),
@@ -82,21 +84,14 @@ class HomeView extends GetView<HomeController> {
                                 size: 24,
                               ),
                               onPressed: () {
-                                Get.to(NotificationsScreen());
+                                Get.to(NotificationScreen());
                               },
                             ),
                           ),
                           Positioned(
                             right: 8,
                             top: 8,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
+                            child: Container(width: 8, height: 8),
                           ),
                         ],
                       ),
@@ -115,311 +110,358 @@ class HomeView extends GetView<HomeController> {
                     topRight: Radius.circular(32),
                   ),
                 ),
-                child: Obx(() => controller.isLoading.value 
-                  ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 16),
-                          Text('Loading profile...'),
-                        ],
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: controller.refreshStudentData,
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Enhanced Profile Card with glassmorphism effect
-                            Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.white,
-                                    Colors.white.withOpacity(0.9),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.08),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.2),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  // Enhanced Profile Avatar with border and shadow
-                                  Container(
-                                    width: 60,
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          AppColors.primary.withOpacity(0.1),
-                                          AppColors.primary.withOpacity(0.05),
-                                        ],
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppColors.primary.withOpacity(0.2),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Container(
-                                      margin: const EdgeInsets.all(3),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                          image: controller.profileImageUrl != null && controller.profileImageUrl!.isNotEmpty
-                                            ? NetworkImage(controller.profileImageUrl!)
-                                            : const NetworkImage(
-                                                'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-                                              ),
-                                          fit: BoxFit.cover,
-                                          onError: (exception, stackTrace) {
-                                            // Handle image load error
-                                          },
-                                        ),
-                                      ),
-                                      child: controller.profileImageUrl == null || controller.profileImageUrl!.isEmpty
-                                        ? Icon(
-                                            Icons.person,
-                                            size: 30,
-                                            color: AppColors.primary.withOpacity(0.7),
-                                          )
-                                        : null,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  // Enhanced Profile Info
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          controller.studentName,
-                                          style: AppTextStyles.profileName.copyWith(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          controller.studentDepartment,
-                                          style: AppTextStyles.profileSubtitle
-                                              .copyWith(
-                                                color: AppColors.primary,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                        ),
-                                        Text(
-                                          'Roll No: ${controller.studentId}',
-                                          style: AppTextStyles.profileSubtitle
-                                              .copyWith(fontSize: 12),
-                                        ),
-                                        if (controller.studentSemester.isNotEmpty)
-                                          Text(
-                                            controller.studentSemester,
-                                            style: AppTextStyles.profileSubtitle
-                                                .copyWith(
-                                                  fontSize: 11,
-                                                  color: Colors.grey[600],
-                                                ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                  // Status indicator
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: controller.isProfileComplete 
-                                        ? Colors.green.withOpacity(0.1)
-                                        : Colors.orange.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          width: 6,
-                                          height: 6,
-                                          decoration: BoxDecoration(
-                                            color: controller.isProfileComplete 
-                                              ? Colors.green 
-                                              : Colors.orange,
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          controller.isProfileComplete 
-                                            ? 'Complete' 
-                                            : 'Incomplete',
-                                          style: TextStyle(
-                                            color: controller.isProfileComplete 
-                                              ? Colors.green[700] 
-                                              : Colors.orange[700],
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            const SizedBox(height: 32),
-
-                            // Enhanced Action Cards Grid
-                            GridView.count(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 14,
-                              mainAxisSpacing: 14,
-                              childAspectRatio: 1,
+                child: Obx(
+                  () => controller.isLoading.value
+                      ? const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 16),
+                              Text('Loading profile...'),
+                            ],
+                          ),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: controller.refreshStudentData,
+                          child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.all(14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildEnhancedActionCard(
-                                  icon: Icons.add_circle_outline,
-                                  title: 'Apply for Leave',
-                                  subtitle: 'Request new leave',
-                                  gradient: [Colors.blue[400]!, Colors.blue[600]!],
-                                  onTap: controller.onApplyForLeave,
-                                ),
-                                _buildEnhancedActionCard(
-                                  icon: Icons.timeline_outlined,
-                                  title: 'Leave Status',
-                                  subtitle: 'Check applications',
-                                  gradient: [Colors.green[400]!, Colors.green[600]!],
-                                  onTap: controller.onViewLeaveStatus,
-                                ),
-                                _buildEnhancedActionCard(
-                                  icon: Icons.person_outline_rounded,
-                                  title: 'My Profile',
-                                  subtitle: 'View & edit profile',
-                                  gradient: [
-                                    Colors.purple[400]!,
-                                    Colors.purple[600]!,
-                                  ],
-                                  onTap: controller.onMyProfile,
-                                ),
-                                _buildEnhancedActionCard(
-                                  icon: Icons.logout_rounded,
-                                  title: 'Logout',
-                                  subtitle: 'Sign out safely',
-                                  gradient: [Colors.red[400]!, Colors.red[600]!],
-                                  onTap: controller.onLogout,
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 32),
-
-                            // Enhanced Recent Leave Applications Section
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Recent Applications',
-                                  style: AppTextStyles.sectionTitle.copyWith(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: controller.onViewLeaveStatus,
-                                  child: Text(
-                                    'View All',
-                                    style: TextStyle(
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Enhanced Leave Applications List
-                            controller.recentLeaveApplications.isEmpty
-                              ? Container(
-                                  padding: const EdgeInsets.all(40),
+                                // Enhanced Profile Card with glassmorphism effect
+                                Container(
+                                  padding: const EdgeInsets.all(20),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[50],
-                                    borderRadius: BorderRadius.circular(16),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.white,
+                                        Colors.white.withOpacity(0.9),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.08),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
                                     border: Border.all(
-                                      color: Colors.grey[200]!,
+                                      color: Colors.white.withOpacity(0.2),
                                       width: 1,
                                     ),
                                   ),
-                                  child: Column(
+                                  child: Row(
                                     children: [
-                                      Icon(
-                                        Icons.assignment_outlined,
-                                        size: 48,
-                                        color: Colors.grey[400],
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        'No recent applications',
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
+                                      // Enhanced Profile Avatar with border and shadow
+                                      Container(
+                                        width: 60,
+                                        height: 60,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              AppColors.primary.withOpacity(
+                                                0.1,
+                                              ),
+                                              AppColors.primary.withOpacity(
+                                                0.05,
+                                              ),
+                                            ],
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.primary
+                                                  .withOpacity(0.2),
+                                              blurRadius: 12,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Container(
+                                          margin: const EdgeInsets.all(3),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                              image:
+                                                  controller.profileImageUrl !=
+                                                          null &&
+                                                      controller
+                                                          .profileImageUrl!
+                                                          .isNotEmpty
+                                                  ? NetworkImage(
+                                                      controller
+                                                          .profileImageUrl!,
+                                                    )
+                                                  : const NetworkImage(''),
+                                              fit: BoxFit.cover,
+                                              onError: (exception, stackTrace) {
+                                                // Handle image load error
+                                              },
+                                            ),
+                                          ),
+                                          child:
+                                              controller.profileImageUrl ==
+                                                      null ||
+                                                  controller
+                                                      .profileImageUrl!
+                                                      .isEmpty
+                                              ? Icon(
+                                                  Icons.person,
+                                                  size: 30,
+                                                  color: AppColors.primary
+                                                      .withOpacity(0.7),
+                                                )
+                                              : null,
                                         ),
                                       ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Your leave applications will appear here',
-                                        style: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 14,
+                                      const SizedBox(width: 6),
+                                      // Enhanced Profile Info
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              controller.studentName,
+                                              style: AppTextStyles.profileName,
+                                              // .copyWith(
+                                              //   fontSize: 15,
+                                              //   fontWeight: FontWeight.w600,
+                                              // ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              controller.studentDepartment,
+                                              style: AppTextStyles
+                                                  .profileSubtitle
+                                                  .copyWith(
+                                                    color: AppColors.primary,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                            ),
+                                            Text(
+                                              'Roll No: ${controller.studentId}',
+                                              style: AppTextStyles
+                                                  .profileSubtitle
+                                                  .copyWith(fontSize: 12),
+                                            ),
+                                            if (controller
+                                                .studentSemester
+                                                .isNotEmpty)
+                                              Text(
+                                                controller.studentSemester,
+                                                style: AppTextStyles
+                                                    .profileSubtitle
+                                                    .copyWith(
+                                                      fontSize: 11,
+                                                      color: Colors.grey[600],
+                                                    ),
+                                              ),
+                                          ],
                                         ),
-                                        textAlign: TextAlign.center,
+                                      ),
+                                      // Status indicator
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: controller.isProfileComplete
+                                              ? Colors.green.withOpacity(0.1)
+                                              : Colors.orange.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              width: 6,
+                                              height: 6,
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    controller.isProfileComplete
+                                                    ? Colors.green
+                                                    : Colors.orange,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              controller.isProfileComplete
+                                                  ? 'Complete'
+                                                  : 'Incomplete',
+                                              style: TextStyle(
+                                                color:
+                                                    controller.isProfileComplete
+                                                    ? Colors.green[700]
+                                                    : Colors.orange[700],
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
-                                )
-                              : ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: controller.recentLeaveApplications.length,
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(height: 12),
-                                  itemBuilder: (context, index) {
-                                    final leave =
-                                        controller.recentLeaveApplications[index];
-                                    return _buildEnhancedLeaveApplicationCard(leave);
-                                  },
                                 ),
 
-                            const SizedBox(height: 40),
-                          ],
+                                const SizedBox(height: 32),
+
+                                // Enhanced Action Cards Grid
+                                GridView.count(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8,
+                                  childAspectRatio: 1,
+                                  children: [
+                                    _buildEnhancedActionCard(
+                                      icon: Icons.add_circle_outline,
+                                      title: 'Apply for Leave',
+                                      subtitle: 'Request new leave',
+                                      gradient: [
+                                        Colors.blue[400]!,
+                                        Colors.blue[600]!,
+                                      ],
+                                      onTap: controller.onApplyForLeave,
+                                    ),
+                                    _buildEnhancedActionCard(
+                                      icon: Icons.timeline_outlined,
+                                      title: 'Leave Status',
+                                      subtitle: 'Check applications',
+                                      gradient: [
+                                        Colors.green[400]!,
+                                        Colors.green[600]!,
+                                      ],
+                                      onTap: controller.onViewLeaveStatus,
+                                    ),
+                                    _buildEnhancedActionCard(
+                                      icon: Icons.person_outline_rounded,
+                                      title: 'My Profile',
+                                      subtitle: 'View & edit profile',
+                                      gradient: [
+                                        Colors.purple[400]!,
+                                        Colors.purple[600]!,
+                                      ],
+                                      onTap: controller.onMyProfile,
+                                    ),
+                                    _buildEnhancedActionCard(
+                                      icon: Icons.logout_rounded,
+                                      title: 'Logout',
+                                      subtitle: 'Sign out safely',
+                                      gradient: [
+                                        Colors.red[400]!,
+                                        Colors.red[600]!,
+                                      ],
+                                      onTap: controller.onLogout,
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 32),
+
+                                // Enhanced Recent Leave Applications Section
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Recent Applications',
+                                      style: AppTextStyles.sectionTitle
+                                          .copyWith(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                    TextButton(
+                                      onPressed: controller.onViewLeaveStatus,
+                                      child: Text(
+                                        'View All',
+                                        style: TextStyle(
+                                          color: AppColors.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Enhanced Leave Applications List
+                                controller.recentLeaveApplications.isEmpty
+                                    ? Container(
+                                        padding: const EdgeInsets.all(40),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[50],
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.grey[200]!,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Icon(
+                                              Icons.assignment_outlined,
+                                              size: 48,
+                                              color: Colors.grey[400],
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              'No recent applications',
+                                              style: TextStyle(
+                                                color: Colors.grey[600],
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Your leave applications will appear here',
+                                              style: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 14,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : ListView.separated(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: controller
+                                            .recentLeaveApplications
+                                            .length,
+                                        separatorBuilder: (context, index) =>
+                                            const SizedBox(height: 12),
+                                        itemBuilder: (context, index) {
+                                          final leave = controller
+                                              .recentLeaveApplications[index];
+                                          return _buildEnhancedLeaveApplicationCard(
+                                            leave,
+                                          );
+                                        },
+                                      ),
+
+                                const SizedBox(height: 40),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
                 ),
               ),
             ),
@@ -439,7 +481,7 @@ class HomeView extends GetView<HomeController> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        // padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,

@@ -1,7 +1,6 @@
 import 'package:digislips/app/core/theme/app_them.dart';
 import 'package:digislips/app/modules/auth/login/login_page.dart';
 import 'package:digislips/app/modules/notification/notification_controller.dart';
-import 'package:digislips/app/modules/notification/notification_service/notification_service.dart';
 import 'package:digislips/app/routes/app_pages.dart';
 import 'package:digislips/app/shared/widgets/bottomnavigation/bottomnavigation.dart';
 import 'package:digislips/firebase_options.dart';
