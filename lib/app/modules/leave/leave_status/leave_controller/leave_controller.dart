@@ -4,7 +4,6 @@ import 'package:digislips/app/modules/leave/leave_service/leave_service.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class LeaveController extends GetxController {
   final LeaveService _leaveService = LeaveService();
   final RxList<LeaveModel> leaveRequests = <LeaveModel>[].obs;
@@ -37,15 +36,17 @@ class LeaveController extends GetxController {
   void _listenToLeaveRequests() {
     if (currentUserId.value.isEmpty) return;
 
-    _leaveService.getUserLeaveApplications(currentUserId.value).listen(
-      (leaves) {
-        leaveRequests.value = leaves;
-      },
-      onError: (error) {
-        Get.snackbar('Error', 'Failed to fetch leave requests: $error');
-        loadSampleData(); // Fallback to sample data on error
-      },
-    );
+    _leaveService
+        .getUserLeaveApplications(currentUserId.value)
+        .listen(
+          (leaves) {
+            leaveRequests.value = leaves;
+          },
+          onError: (error) {
+            Get.snackbar('Error', 'Failed to fetch leave requests: $error');
+            loadSampleData(); // Fallback to sample data on error
+          },
+        );
   }
 
   void loadSampleData() {
@@ -61,6 +62,7 @@ class LeaveController extends GetxController {
         status: 'Pending',
         submittedAt: DateTime(2023, 10, 14),
         submittedBy: 'current_user',
+        userid: 'current_user',
       ),
       LeaveModel(
         id: '2',
@@ -74,6 +76,7 @@ class LeaveController extends GetxController {
         submittedBy: 'current_user',
         reviewedBy: 'admin',
         reviewedAt: DateTime(2023, 11, 16),
+        userid: 'current_user',
       ),
       LeaveModel(
         id: '3',
@@ -87,7 +90,9 @@ class LeaveController extends GetxController {
         submittedBy: 'current_user',
         reviewedBy: 'admin',
         reviewedAt: DateTime(2023, 10, 26),
-        reviewComments: 'Please submit additional documentation supporting your request.',
+        reviewComments:
+            'Please submit additional documentation supporting your request.',
+        userid: 'current_user',
       ),
       LeaveModel(
         id: '4',
@@ -101,6 +106,7 @@ class LeaveController extends GetxController {
         submittedBy: 'current_user',
         reviewedBy: 'admin',
         reviewedAt: DateTime(2023, 12, 21),
+        userid: 'current_user',
       ),
       LeaveModel(
         id: '5',
@@ -112,6 +118,7 @@ class LeaveController extends GetxController {
         status: 'Pending',
         submittedAt: DateTime(2024, 1, 10),
         submittedBy: 'current_user',
+        userid: 'current_user',
       ),
     ];
   }
@@ -121,13 +128,19 @@ class LeaveController extends GetxController {
       return leaveRequests;
     }
     return leaveRequests
-        .where((request) => request.status.toLowerCase() == selectedFilter.value.toLowerCase())
+        .where(
+          (request) =>
+              request.status.toLowerCase() ==
+              selectedFilter.value.toLowerCase(),
+        )
         .toList();
   }
 
-  
-
-  Future<void> updateLeaveStatus(String leaveId, String status, {String? reviewComments}) async {
+  Future<void> updateLeaveStatus(
+    String leaveId,
+    String status, {
+    String? reviewComments,
+  }) async {
     if (currentUserId.value.isEmpty) {
       Get.snackbar('Error', 'User not authenticated');
       return;
@@ -139,7 +152,8 @@ class LeaveController extends GetxController {
         userId: currentUserId.value,
         leaveId: leaveId,
         status: status,
-        reviewedBy: 'current_user', // You might want to get this from user session
+        reviewedBy:
+            'current_user', // You might want to get this from user session
         reviewComments: reviewComments,
       );
       Get.snackbar('Success', 'Leave request updated successfully');

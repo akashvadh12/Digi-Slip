@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LeaveModel {
   final String? id;
+  final String? userid;
   final String leaveType;
   final DateTime fromDate;
   final DateTime toDate;
@@ -19,6 +20,7 @@ class LeaveModel {
   final String? reviewComments;
 
   LeaveModel({
+    required this.userid,
     this.id,
     required this.leaveType,
     required this.fromDate,
@@ -39,7 +41,7 @@ class LeaveModel {
   // Convert from Firestore document
   factory LeaveModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    
+
     return LeaveModel(
       id: doc.id,
       leaveType: data['leaveType'] ?? '',
@@ -53,11 +55,12 @@ class LeaveModel {
       status: data['status'] ?? 'Pending',
       submittedAt: (data['submittedAt'] as Timestamp).toDate(),
       submittedBy: data['submittedBy'] ?? '',
+      userid: data['userid']?? '',
       reviewedBy: data['reviewedBy'],
-      reviewedAt: data['reviewedAt'] != null 
-          ? (data['reviewedAt'] as Timestamp).toDate() 
+      reviewedAt: data['reviewedAt'] != null
+          ? (data['reviewedAt'] as Timestamp).toDate()
           : null,
-      reviewComments: data['reviewComments'],
+      reviewComments: data['reviewComments'], 
     );
   }
 
@@ -112,6 +115,7 @@ class LeaveModel {
       status: status ?? this.status,
       submittedAt: submittedAt ?? this.submittedAt,
       submittedBy: submittedBy ?? this.submittedBy,
+      userid: userid ?? this.userid,
       reviewedBy: reviewedBy ?? this.reviewedBy,
       reviewedAt: reviewedAt ?? this.reviewedAt,
       reviewComments: reviewComments ?? this.reviewComments,

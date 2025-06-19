@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:digislips/app/modules/leave/leave_model/leave_model.dart';
 import 'package:digislips/app/modules/leave/leave_status/leave_status_page.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -223,7 +224,7 @@ class ApplyLeaveController extends GetxController {
       try {
         // Create path: users/{uid}/leave/{timestamp}_{filename}
         String fileName =
-            'users/${currentUserId.value}/leave/${DateTime.now().millisecondsSinceEpoch}_${uploadedFileNames[i]}';
+            'students/${currentUserId.value}/leave/${DateTime.now().millisecondsSinceEpoch}_${uploadedFileNames[i]}';
 
         UploadTask uploadTask = _storage
             .ref()
@@ -316,6 +317,7 @@ class ApplyLeaveController extends GetxController {
 
       // Create leave model instance
       LeaveModel leaveApplication = LeaveModel(
+        userid: currentUserId.value,
         leaveType: selectedLeaveType.value,
         fromDate: fromDate.value!,
         toDate: toDate.value!,
@@ -331,7 +333,7 @@ class ApplyLeaveController extends GetxController {
 
       // Submit to Firestore in user's subcollection: users/{uid}/leave/{docId}
       DocumentReference docRef = await _firestore
-          .collection('users')
+          .collection('students')
           .doc(currentUserId.value)
           .collection('leave')
           .add(leaveApplication.toFirestore());
@@ -390,7 +392,7 @@ class ApplyLeaveController extends GetxController {
     }
 
     return _firestore
-        .collection('users')
+        .collection('students')
         .doc(currentUserId.value)
         .collection('leave')
         .orderBy('submittedAt', descending: true)
@@ -411,7 +413,7 @@ class ApplyLeaveController extends GetxController {
       final endOfYear = DateTime(DateTime.now().year, 12, 31);
 
       final querySnapshot = await _firestore
-          .collection('users')
+          .collection('students')
           .doc(currentUserId.value)
           .collection('leave')
           .where('status', isEqualTo: 'Approved')
@@ -441,7 +443,7 @@ class ApplyLeaveController extends GetxController {
 
     try {
       final querySnapshot = await _firestore
-          .collection('users')
+          .collection('students')
           .doc(currentUserId.value)
           .collection('leave')
           .where('status', whereIn: ['Pending', 'Approved'])

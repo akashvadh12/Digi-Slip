@@ -235,6 +235,7 @@ class RegistrationController extends GetxController {
       // Prepare student model
       final student = Student(
         uid: userCredential.user!.uid,
+
         fullName: fullNameController.text.trim(),
         email: email,
         phone: phoneController.text.trim(),

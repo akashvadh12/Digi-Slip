@@ -9,7 +9,7 @@ class LeaveService {
   Future<String> createLeaveApplication(String userId, LeaveModel leave) async {
     try {
       DocumentReference docRef = await _firestore
-          .collection('users')
+          .collection('students')
           .doc(userId)
           .collection('leave')
           .add(leave.toFirestore());
@@ -27,7 +27,7 @@ class LeaveService {
   ) async {
     try {
       DocumentSnapshot doc = await _firestore
-          .collection('users')
+          .collection('students')
           .doc(userId)
           .collection('leave')
           .doc(leaveId)
@@ -45,7 +45,7 @@ class LeaveService {
   // Get all leave applications for a user
   Stream<List<LeaveModel>> getUserLeaveApplications(String userId) {
     return _firestore
-        .collection('users')
+        .collection('students')
         .doc(userId)
         .collection('leave')
         .orderBy('submittedAt', descending: true)
@@ -120,7 +120,7 @@ class LeaveService {
       }
 
       await _firestore
-          .collection('users')
+          .collection('students')
           .doc(userId)
           .collection('leave')
           .doc(leaveId)
@@ -134,7 +134,7 @@ class LeaveService {
   Future<void> deleteLeaveApplication(String userId, String leaveId) async {
     try {
       await _firestore
-          .collection('users')
+          .collection('students')
           .doc(userId)
           .collection('leave')
           .doc(leaveId)
@@ -151,7 +151,7 @@ class LeaveService {
     required DateTime endDate,
   }) {
     return _firestore
-        .collection('users')
+        .collection('students')
         .doc(userId)
         .collection('leave')
         .where(
@@ -174,7 +174,7 @@ class LeaveService {
     required String status,
   }) {
     return _firestore
-        .collection('users')
+        .collection('students')
         .doc(userId)
         .collection('leave')
         .where('status', isEqualTo: status)
@@ -195,7 +195,7 @@ class LeaveService {
       final endOfYear = DateTime(currentYear, 12, 31);
 
       final querySnapshot = await _firestore
-          .collection('users')
+          .collection('students')
           .doc(userId)
           .collection('leave')
           .where(
@@ -248,7 +248,7 @@ class LeaveService {
   }) async {
     try {
       final querySnapshot = await _firestore
-          .collection('users')
+          .collection('students')
           .doc(userId)
           .collection('leave')
           .where('status', whereIn: ['Pending', 'Approved'])
@@ -285,7 +285,7 @@ class LeaveService {
     final endOfMonth = DateTime(year, month + 1, 0);
 
     return _firestore
-        .collection('users')
+        .collection('students')
         .doc(userId)
         .collection('leave')
         .where(
