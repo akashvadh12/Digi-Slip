@@ -180,7 +180,7 @@ class RegistrationController extends GetxController {
           'Roll number already exists in ${selectedDepartment.value} department',
           backgroundColor: AppColors.error,
           colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+          snackPosition: SnackPosition.TOP,
           margin: const EdgeInsets.all(16),
           borderRadius: 12,
         );
@@ -195,7 +195,7 @@ class RegistrationController extends GetxController {
           'An account with this email already exists',
           backgroundColor: AppColors.error,
           colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+          snackPosition: SnackPosition.TOP,
           margin: const EdgeInsets.all(16),
           borderRadius: 12,
         );
@@ -216,7 +216,7 @@ class RegistrationController extends GetxController {
           'Failed to create user',
           backgroundColor: AppColors.error,
           colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+          snackPosition: SnackPosition.TOP,
           margin: const EdgeInsets.all(16),
           borderRadius: 12,
         );
@@ -267,7 +267,7 @@ class RegistrationController extends GetxController {
         'Please login to verify your account',
         backgroundColor: Colors.green,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
         duration: const Duration(seconds: 5),
@@ -301,7 +301,7 @@ class RegistrationController extends GetxController {
         errorMessage,
         backgroundColor: AppColors.error,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
       );
@@ -311,7 +311,7 @@ class RegistrationController extends GetxController {
         'An unexpected error occurred: ${e.toString()}',
         backgroundColor: AppColors.error,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
       );

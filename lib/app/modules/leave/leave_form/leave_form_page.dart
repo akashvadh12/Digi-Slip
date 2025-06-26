@@ -131,17 +131,16 @@ class ApplyLeaveView extends GetView<ApplyLeaveController> {
                       ),
                       const SizedBox(height: 8),
                       _buildCompactTravelFields(),
-
-                      const SizedBox(height: 20),
+                      // uncomment to add documents
+                      // const SizedBox(height: 20),
 
                       // Compact Document Upload
-                      _buildCompactSectionHeader(
-                        'Supporting Documents',
-                        Icons.cloud_upload_rounded,
-                      ),
-                      const SizedBox(height: 8),
-                      _buildCompactDocumentUpload(),
-
+                      // _buildCompactSectionHeader(
+                      //   'Supporting Documents',
+                      //   Icons.cloud_upload_rounded,
+                      // ),
+                      // const SizedBox(height: 8),
+                      // _buildCompactDocumentUpload(),
                       const SizedBox(height: 24),
 
                       // Submit Button
@@ -241,13 +240,13 @@ class ApplyLeaveView extends GetView<ApplyLeaveController> {
                             fontSize: 14,
                           ),
                         ),
-                        Text(
-                          _getLeaveTypeDescription(type),
-                          style: TextStyle(
-                            color: AppColors.greyColor,
-                            fontSize: 11,
-                          ),
-                        ),
+                        // Text(
+                        //   _getLeaveTypeDescription(type),
+                        //   style: TextStyle(
+                        //     color: AppColors.greyColor,
+                        //     fontSize: 11,
+                        //   ),
+                        // ),
                       ],
                     ),
                   ],
@@ -256,7 +255,7 @@ class ApplyLeaveView extends GetView<ApplyLeaveController> {
             }).toList(),
             onChanged: (String? newValue) {
               if (newValue != null) {
-                controller.selectLeaveType(newValue);
+                controller.selectedLeaveType(newValue);
               }
             },
           ),
@@ -282,7 +281,7 @@ class ApplyLeaveView extends GetView<ApplyLeaveController> {
       case 'study':
         return 'Educational leave';
       default:
-        return 'General leave';
+        return '';
     }
   }
 

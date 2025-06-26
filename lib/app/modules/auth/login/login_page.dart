@@ -669,6 +669,7 @@ class _LoginScreenState extends State<LoginScreen>
                     : () async {
                         if (emailController.text.trim().isEmpty) {
                           Get.snackbar(
+                            snackPosition: SnackPosition.TOP,
                             'Error',
                             'Please enter your email address',
                             backgroundColor: Colors.red,

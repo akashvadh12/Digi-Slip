@@ -6,23 +6,17 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/core/theme/app_text_styles.dart';
 import 'package:digislips/app/modules/splash_screen/splash_screen.dart';
-import 'package:digislips/app/routes/app_rout.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class ProfileController extends GetxController {
-  // Firestore and Storage instances
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
- 
-  // Observable student data
+
   var student = Rxn<Student>();
 
-  // Loading states
   var isLoading = false.obs;
   var isEditingProfile = false.obs;
   var isUploadingImage = false.obs;
@@ -36,6 +30,7 @@ class ProfileController extends GetxController {
   final parentEmailController = TextEditingController();
   final departmentController = TextEditingController();
   var selectedSemester = '1st Semester'.obs;
+  var selectedDepartment = 'Computer Science'.obs; // Added for dropdown
 
   // Available semesters
   final List<String> availableSemesters = [
@@ -49,7 +44,7 @@ class ProfileController extends GetxController {
     '8th Semester',
   ];
 
-  // Available departments (you can customize this)
+  // Available departments (updated for dropdown)
   final List<String> availableDepartments = [
     'Computer Science',
     'Information Technology',
@@ -61,7 +56,7 @@ class ProfileController extends GetxController {
     'Others',
   ];
 
-  // Getters for easy access to student data
+  // Keep all existing getters
   String get fullName => student.value?.fullName ?? 'Loading...';
   String get role => 'Student';
   String get department => student.value?.department ?? 'Loading...';
@@ -89,7 +84,6 @@ class ProfileController extends GetxController {
     super.onClose();
   }
 
-  // Fetch student data from Firestore
   Future<void> fetchStudentData() async {
     try {
       isLoading.value = true;
@@ -102,13 +96,11 @@ class ProfileController extends GetxController {
         throw Exception('No user ID found. Please login again.');
       }
 
-      // Get profile data from Firestore
       final doc = await _firestore.collection('students').doc(uid).get();
 
       if (doc.exists && doc.data() != null) {
         Student firestoreStudent = Student.fromMap(doc.data()!);
 
-        // Get profile image URL from Realtime Database
         final DatabaseReference dbRef = FirebaseDatabase.instance.ref().child(
           'profile_images/$uid',
         );
@@ -119,9 +111,7 @@ class ProfileController extends GetxController {
           imageUrl = snapshot.value.toString();
         }
 
-        // Update student model with image URL from Realtime DB
         student.value = firestoreStudent.copyWith(profileImageUrl: imageUrl);
-
         _populateEditControllers();
       } else {
         throw Exception('Student data not found');
@@ -139,102 +129,95 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Populate edit form controllers with current data
   void _populateEditControllers() {
     if (student.value != null) {
       fullNameController.text = student.value!.fullName;
       phoneController.text = student.value!.phone;
       parentPhoneController.text = student.value!.parentPhone ?? '';
       parentEmailController.text = student.value!.parentEmail ?? '';
-      departmentController.text = student.value!.department;
       selectedSemester.value = student.value!.semester;
+      selectedDepartment.value =
+          student.value!.department; // Set dropdown value
     }
   }
 
-  // Start editing profile
   void startEditingProfile() {
     if (student.value == null) {
       _showErrorSnackbar('Error', 'Profile data not loaded yet');
       return;
     }
-
     _populateEditControllers();
     isEditingProfile.value = true;
   }
 
-  // Cancel editing
   void cancelEditing() {
     isEditingProfile.value = false;
-    _populateEditControllers(); // Reset to original values
+    _populateEditControllers();
   }
 
-  // Validate email format
   bool _isValidEmail(String email) {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 
-  // Validate phone number format (basic validation)
+  // Updated to require exactly 10 digits
   bool _isValidPhone(String phone) {
-    return RegExp(r'^\+?[\d\s\-\(\)]{10,}$').hasMatch(phone);
+    return RegExp(r'^[0-9]{10}$').hasMatch(phone);
   }
 
-  // Save profile changes
   Future<void> saveProfileChanges() async {
     if (student.value == null) return;
 
     try {
       isLoading.value = true;
 
-      // Validate required fields
       if (fullNameController.text.trim().isEmpty) {
         _showErrorSnackbar('Validation Error', 'Full name is required');
         return;
       }
 
-      if (phoneController.text.trim().isEmpty) {
-        _showErrorSnackbar('Validation Error', 'Phone number is required');
-        return;
-      }
-
-      // Validate phone number format
+      // Updated phone validation message
       if (!_isValidPhone(phoneController.text.trim())) {
-        _showErrorSnackbar('Validation Error', 'Please enter a valid phone number');
+        _showErrorSnackbar(
+          'Validation Error',
+          'Please enter a valid 10-digit phone number',
+        );
         return;
       }
 
-      // Validate parent phone if provided
-      if (parentPhoneController.text.trim().isNotEmpty && 
+      if (parentPhoneController.text.trim().isNotEmpty &&
           !_isValidPhone(parentPhoneController.text.trim())) {
-        _showErrorSnackbar('Validation Error', 'Please enter a valid parent phone number');
+        _showErrorSnackbar(
+          'Validation Error',
+          'Please enter a valid 10-digit parent phone number',
+        );
         return;
       }
 
-      // Validate parent email if provided
-      if (parentEmailController.text.trim().isNotEmpty && 
+      if (parentEmailController.text.trim().isNotEmpty &&
           !_isValidEmail(parentEmailController.text.trim())) {
-        _showErrorSnackbar('Validation Error', 'Please enter a valid parent email address');
+        _showErrorSnackbar(
+          'Validation Error',
+          'Please enter a valid parent email address',
+        );
         return;
       }
 
-      // Create updated student object
       final updatedStudent = student.value!.copyWith(
         fullName: fullNameController.text.trim(),
         phone: phoneController.text.trim(),
-        parentPhone: parentPhoneController.text.trim().isEmpty 
-            ? null 
+        parentPhone: parentPhoneController.text.trim().isEmpty
+            ? null
             : parentPhoneController.text.trim(),
-        parentEmail: parentEmailController.text.trim().isEmpty 
-            ? null 
+        parentEmail: parentEmailController.text.trim().isEmpty
+            ? null
             : parentEmailController.text.trim(),
-        department: departmentController.text.trim().isEmpty
-            ? selectedSemester.value
-            : departmentController.text.trim(),
         semester: selectedSemester.value,
+        department: selectedDepartment.value, // Use dropdown value
       );
 
       await updateStudentData(updatedStudent);
       isEditingProfile.value = false;
-      
+
       _showSuccessSnackbar('Success', 'Profile updated successfully!');
     } catch (e) {
       print('Error saving profile changes: $e');
@@ -244,7 +227,6 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Update student data in Firestore
   Future<void> updateStudentData(Student updatedStudent) async {
     try {
       final dataToUpdate = updatedStudent.toMap();
@@ -263,7 +245,33 @@ class ProfileController extends GetxController {
     }
   }
 
-  // Update only parent information
+  // New method for department dropdown
+  Widget buildDepartmentDropdown() {
+    return Obx(
+      () => DropdownButtonFormField<String>(
+        value: selectedDepartment.value,
+        decoration: InputDecoration(
+          labelText: 'Department',
+          border: OutlineInputBorder(),
+        ),
+        items: availableDepartments.map((String department) {
+          return DropdownMenuItem<String>(
+            value: department,
+            child: Text(department),
+          );
+        }).toList(),
+        onChanged: isEditingProfile.value
+            ? (String? newValue) {
+                if (newValue != null) {
+                  selectedDepartment.value = newValue;
+                }
+              }
+            : null,
+      ),
+    );
+  }
+
+  // Existing methods remain unchanged below this point
   Future<void> updateParentInfo({
     required String parentPhone,
     required String parentEmail,
@@ -273,15 +281,19 @@ class ProfileController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Validate parent phone if provided
       if (parentPhone.trim().isNotEmpty && !_isValidPhone(parentPhone.trim())) {
-        _showErrorSnackbar('Validation Error', 'Please enter a valid parent phone number');
+        _showErrorSnackbar(
+          'Validation Error',
+          'Please enter a valid 10-digit parent phone number',
+        );
         return;
       }
 
-      // Validate parent email if provided
       if (parentEmail.trim().isNotEmpty && !_isValidEmail(parentEmail.trim())) {
-        _showErrorSnackbar('Validation Error', 'Please enter a valid parent email address');
+        _showErrorSnackbar(
+          'Validation Error',
+          'Please enter a valid parent email address',
+        );
         return;
       }
 
@@ -291,18 +303,23 @@ class ProfileController extends GetxController {
       );
 
       await updateStudentData(updatedStudent);
-      _showSuccessSnackbar('Success', 'Parent information updated successfully!');
+      _showSuccessSnackbar(
+        'Success',
+        'Parent information updated successfully!',
+      );
     } catch (e) {
       print('Error updating parent info: $e');
-      _showErrorSnackbar('Error', 'Failed to update parent information: ${e.toString()}');
+      _showErrorSnackbar(
+        'Error',
+        'Failed to update parent information: ${e.toString()}',
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
-  // Refresh profile from Realtime Database
   Future<void> refreshProfile() async {
-    await fetchStudentData(); // Make sure fetchStudentData() pulls from Realtime DB
+    await fetchStudentData();
   }
 
   void changePassword() {
@@ -351,7 +368,6 @@ class ProfileController extends GetxController {
             child: TextButton(
               onPressed: () async {
                 Get.back();
-
                 try {
                   await FirebaseAuth.instance.signOut();
                   final prefs = await SharedPreferences.getInstance();
@@ -369,10 +385,7 @@ class ProfileController extends GetxController {
                   );
 
                   await Future.delayed(Duration(milliseconds: 500));
-                  Get.offAll(
-                    () => SplashScreen(),
-                    transition: Transition.fadeIn,
-                  );
+                  Get.offAll(() => SplashScreen());
                 } catch (e) {
                   print('Error during logout: $e');
                   _showErrorSnackbar('Error', 'Failed to logout properly');
@@ -389,13 +402,12 @@ class ProfileController extends GetxController {
     );
   }
 
-  // Helper methods for showing snackbars
   void _showSuccessSnackbar(String title, String message) {
     Get.snackbar(
       title,
       message,
-      backgroundColor: AppColors.success.withOpacity(0.1),
-      colorText: AppColors.success,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
       snackPosition: SnackPosition.TOP,
       margin: EdgeInsets.all(16),
       borderRadius: 12,

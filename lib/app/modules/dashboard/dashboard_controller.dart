@@ -112,7 +112,7 @@ class HomeController extends GetxController {
         Get.snackbar(
           'Error',
           'User not found. Please login again.',
-          snackPosition: SnackPosition.BOTTOM,
+          snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
@@ -133,7 +133,7 @@ class HomeController extends GetxController {
         Get.snackbar(
           'Error',
           'Student profile not found.',
-          snackPosition: SnackPosition.BOTTOM,
+          snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
@@ -142,7 +142,7 @@ class HomeController extends GetxController {
       Get.snackbar(
         'Error',
         'Failed to load profile: $e',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -178,7 +178,7 @@ class HomeController extends GetxController {
               Get.snackbar(
                 'Error',
                 'Failed to load leave applications: $error',
-                snackPosition: SnackPosition.BOTTOM,
+                snackPosition: SnackPosition.TOP,
                 backgroundColor: Colors.red,
                 colorText: Colors.white,
               );

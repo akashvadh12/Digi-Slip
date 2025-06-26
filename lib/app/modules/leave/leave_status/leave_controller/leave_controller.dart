@@ -1,6 +1,9 @@
 // controllers/leave_controller.dart
+import 'dart:ui';
+
 import 'package:digislips/app/modules/leave/leave_model/leave_model.dart';
 import 'package:digislips/app/modules/leave/leave_service/leave_service.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,7 +31,15 @@ class LeaveController extends GetxController {
         loadSampleData(); // Fallback to sample data if no user ID
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to initialize user: $e');
+      Get.snackbar(
+        'Error',
+         'Failed to initialize user: $e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFFD32F2F),
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
+     
       loadSampleData(); // Fallback to sample data
     }
   }
@@ -43,7 +54,15 @@ class LeaveController extends GetxController {
             leaveRequests.value = leaves;
           },
           onError: (error) {
-            Get.snackbar('Error', 'Failed to fetch leave requests: $error');
+             Get.snackbar(
+        'Error',
+       'Failed to fetch leave requests: $error',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFFD32F2F),
+        colorText: Colors.white,
+        duration: const Duration(seconds: 5),
+      );
+           
             loadSampleData(); // Fallback to sample data on error
           },
         );
@@ -142,7 +161,14 @@ class LeaveController extends GetxController {
     String? reviewComments,
   }) async {
     if (currentUserId.value.isEmpty) {
-      Get.snackbar('Error', 'User not authenticated');
+      Get.snackbar(
+        'Error',
+        'User not authenticated',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFFD32F2F),
+        colorText: Colors.white,
+      );
+      
       return;
     }
 
@@ -156,9 +182,26 @@ class LeaveController extends GetxController {
             'current_user', // You might want to get this from user session
         reviewComments: reviewComments,
       );
-      Get.snackbar('Success', 'Leave request updated successfully');
+        Get.snackbar(
+        'Success',
+        'Leave request updated successfully',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+        duration: const Duration(seconds: 5),
+      );
+      
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update leave request: $e');
+       Get.snackbar(
+        'Error',
+        'Failed to update leave request: $e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFFD32F2F),
+        colorText: Colors.white,
+      );
+     
     } finally {
       isLoading.value = false;
     }
@@ -166,16 +209,36 @@ class LeaveController extends GetxController {
 
   Future<void> deleteLeaveRequest(String leaveId) async {
     if (currentUserId.value.isEmpty) {
-      Get.snackbar('Error', 'User not authenticated');
+       Get.snackbar(
+        'Error',
+        'User not authenticated',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFFD32F2F),
+        colorText: Colors.white,
+      );
+     
       return;
     }
 
     try {
       isLoading.value = true;
       await _leaveService.deleteLeaveApplication(currentUserId.value, leaveId);
-      Get.snackbar('Success', 'Leave request deleted successfully');
+      Get.snackbar(
+        'Success',
+        'Leave request deleted successfully',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFFD32F2F),
+        colorText: Colors.white,
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete leave request: $e');
+       Get.snackbar(
+        'Error',
+        'Failed to delete leave request: $e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFFD32F2F),
+        colorText: Colors.white,
+      );
+     
     } finally {
       isLoading.value = false;
     }
@@ -196,7 +259,14 @@ class LeaveController extends GetxController {
     try {
       return await _leaveService.getLeaveStatistics(currentUserId.value);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to get leave statistics: $e');
+       Get.snackbar(
+        'Error',
+        'Failed to get leave statistics: $e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFFD32F2F),
+        colorText: Colors.white,
+      );
+     
       return {
         'total': 0,
         'approved': 0,
@@ -225,7 +295,13 @@ class LeaveController extends GetxController {
         excludeLeaveId: excludeLeaveId,
       );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to check overlapping leave: $e');
+        Get.snackbar(
+        'Error',
+        'Failed to check overlapping leave: $e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFFD32F2F),
+        colorText: Colors.white,
+      );
       return false;
     }
   }
