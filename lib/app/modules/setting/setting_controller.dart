@@ -502,9 +502,8 @@ This policy is effective as of the last updated date and will remain in effect e
     Get.snackbar(
       title,
       message,
-      backgroundColor:
-          AppColors.success?.withOpacity(0.1) ?? Colors.green.withOpacity(0.1),
-      colorText: AppColors.success ?? Colors.green,
+      backgroundColor: AppColors.success ?? Colors.green,
+      colorText: AppColors.background ?? Colors.white,
       snackPosition: SnackPosition.TOP,
       margin: EdgeInsets.all(16),
       borderRadius: 12,
@@ -517,8 +516,8 @@ This policy is effective as of the last updated date and will remain in effect e
     Get.snackbar(
       title,
       message,
-      backgroundColor: AppColors.error.withOpacity(0.1),
-      colorText: AppColors.error,
+      backgroundColor: AppColors.error,
+      colorText: AppColors.background,
       snackPosition: SnackPosition.TOP,
       margin: EdgeInsets.all(16),
       borderRadius: 12,
@@ -531,8 +530,8 @@ This policy is effective as of the last updated date and will remain in effect e
     Get.snackbar(
       title,
       message,
-      backgroundColor: AppColors.primary.withOpacity(0.1),
-      colorText: AppColors.primary,
+      backgroundColor: AppColors.primary,
+      colorText: AppColors.background,
       snackPosition: SnackPosition.TOP,
       margin: EdgeInsets.all(16),
       borderRadius: 12,

@@ -274,8 +274,8 @@ class ProfileScreen extends StatelessWidget {
         // Personal & Contact Information Card
         _buildInfoCard(
           title: 'Personal & Contact Information',
-          
-          icon: Icons.person_outline,
+
+          icon: Icons.badge_outlined,
           children: [
             _buildInfoRow(
               Icons.person_outline,
@@ -320,7 +320,7 @@ class ProfileScreen extends StatelessWidget {
           icon: Icons.school_outlined,
           children: [
             _buildInfoRow(
-              Icons.school_outlined,
+              Icons.chrome_reader_mode,
               'Department',
               controller.department,
               AppColors.primary,
@@ -405,12 +405,13 @@ class ProfileScreen extends StatelessWidget {
           title: 'Academic Information',
           icon: Icons.school_outlined,
           children: [
-            _buildEditField(
-              'Department',
-              controller.departmentController,
-              Icons.school_outlined,
-              AppColors.primary,
-            ),
+            _buildDepartmentDropdown(),
+            // _buildEditField(
+            //   'Department',
+            //   controller.departmentController,
+            //   Icons.school_outlined,
+            //   AppColors.primary,
+            // ),
             SizedBox(height: 16),
             _buildSemesterDropdown(),
             SizedBox(height: 16),
@@ -780,6 +781,71 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDepartmentDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Department',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppColors.blackColor,
+          ),
+        ),
+        SizedBox(height: 8),
+        Obx(
+          () => Container(
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderColor, width: 1.5),
+            ),
+            child: DropdownButtonFormField<String>(
+              value: controller.selectedDepartment.value,
+              decoration: InputDecoration(
+                prefixIcon: Container(
+                  margin: EdgeInsets.all(12),
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.pendingColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.school_outlined,
+                    color: AppColors.pendingColor,
+                    size: 18,
+                  ),
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: AppColors.blackColor,
+              ),
+              items: controller.availableDepartments.map((department) {
+                return DropdownMenuItem<String>(
+                  value: department,
+                  child: Text(department),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  controller.selectedDepartment.value = value;
+                }
+              },
+            ),
           ),
         ),
       ],

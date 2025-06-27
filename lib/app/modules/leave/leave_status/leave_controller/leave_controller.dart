@@ -27,20 +27,16 @@ class LeaveController extends GetxController {
       if (uid != null && uid.isNotEmpty) {
         currentUserId.value = uid;
         _listenToLeaveRequests();
-      } else {
-        loadSampleData(); // Fallback to sample data if no user ID
-      }
+      } else {}
     } catch (e) {
       Get.snackbar(
         'Error',
-         'Failed to initialize user: $e',
+        'Failed to initialize user: $e',
         snackPosition: SnackPosition.TOP,
         backgroundColor: const Color(0xFFD32F2F),
         colorText: Colors.white,
         duration: const Duration(seconds: 2),
       );
-     
-      loadSampleData(); // Fallback to sample data
     }
   }
 
@@ -54,92 +50,16 @@ class LeaveController extends GetxController {
             leaveRequests.value = leaves;
           },
           onError: (error) {
-             Get.snackbar(
-        'Error',
-       'Failed to fetch leave requests: $error',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: const Color(0xFFD32F2F),
-        colorText: Colors.white,
-        duration: const Duration(seconds: 5),
-      );
-           
-            loadSampleData(); // Fallback to sample data on error
+            Get.snackbar(
+              'Error',
+              'Failed to fetch leave requests: $error',
+              snackPosition: SnackPosition.TOP,
+              backgroundColor: const Color(0xFFD32F2F),
+              colorText: Colors.white,
+              duration: const Duration(seconds: 5),
+            );
           },
         );
-  }
-
-  void loadSampleData() {
-    // Sample data for UI testing
-    leaveRequests.value = [
-      LeaveModel(
-        id: '1',
-        leaveType: 'Sick Leave',
-        fromDate: DateTime(2023, 10, 15),
-        toDate: DateTime(2023, 10, 16),
-        totalDays: 2,
-        reason: 'Medical appointment and recovery',
-        status: 'Pending',
-        submittedAt: DateTime(2023, 10, 14),
-        submittedBy: 'current_user',
-        userid: 'current_user',
-      ),
-      LeaveModel(
-        id: '2',
-        leaveType: 'Vacation Leave',
-        fromDate: DateTime(2023, 12, 24),
-        toDate: DateTime(2023, 12, 31),
-        totalDays: 8,
-        reason: 'Year-end family vacation',
-        status: 'Approved',
-        submittedAt: DateTime(2023, 11, 15),
-        submittedBy: 'current_user',
-        reviewedBy: 'admin',
-        reviewedAt: DateTime(2023, 11, 16),
-        userid: 'current_user',
-      ),
-      LeaveModel(
-        id: '3',
-        leaveType: 'Family Emergency',
-        fromDate: DateTime(2023, 10, 25),
-        toDate: DateTime(2023, 10, 25),
-        totalDays: 1,
-        reason: 'Urgent family matter requiring immediate attention',
-        status: 'Rejected',
-        submittedAt: DateTime(2023, 10, 25),
-        submittedBy: 'current_user',
-        reviewedBy: 'admin',
-        reviewedAt: DateTime(2023, 10, 26),
-        reviewComments:
-            'Please submit additional documentation supporting your request.',
-        userid: 'current_user',
-      ),
-      LeaveModel(
-        id: '4',
-        leaveType: 'Personal Leave',
-        fromDate: DateTime(2024, 1, 15),
-        toDate: DateTime(2024, 1, 17),
-        totalDays: 3,
-        reason: 'Personal matters and mental health break',
-        status: 'Approved',
-        submittedAt: DateTime(2023, 12, 20),
-        submittedBy: 'current_user',
-        reviewedBy: 'admin',
-        reviewedAt: DateTime(2023, 12, 21),
-        userid: 'current_user',
-      ),
-      LeaveModel(
-        id: '5',
-        leaveType: 'Medical Leave',
-        fromDate: DateTime(2024, 2, 1),
-        toDate: DateTime(2024, 2, 5),
-        totalDays: 5,
-        reason: 'Surgery and post-operative recovery',
-        status: 'Pending',
-        submittedAt: DateTime(2024, 1, 10),
-        submittedBy: 'current_user',
-        userid: 'current_user',
-      ),
-    ];
   }
 
   List<LeaveModel> get filteredRequests {
@@ -168,7 +88,7 @@ class LeaveController extends GetxController {
         backgroundColor: const Color(0xFFD32F2F),
         colorText: Colors.white,
       );
-      
+
       return;
     }
 
@@ -182,7 +102,7 @@ class LeaveController extends GetxController {
             'current_user', // You might want to get this from user session
         reviewComments: reviewComments,
       );
-        Get.snackbar(
+      Get.snackbar(
         'Success',
         'Leave request updated successfully',
         backgroundColor: Colors.green,
@@ -192,16 +112,14 @@ class LeaveController extends GetxController {
         borderRadius: 12,
         duration: const Duration(seconds: 5),
       );
-      
     } catch (e) {
-       Get.snackbar(
+      Get.snackbar(
         'Error',
         'Failed to update leave request: $e',
         snackPosition: SnackPosition.TOP,
         backgroundColor: const Color(0xFFD32F2F),
         colorText: Colors.white,
       );
-     
     } finally {
       isLoading.value = false;
     }
@@ -209,14 +127,14 @@ class LeaveController extends GetxController {
 
   Future<void> deleteLeaveRequest(String leaveId) async {
     if (currentUserId.value.isEmpty) {
-       Get.snackbar(
+      Get.snackbar(
         'Error',
         'User not authenticated',
         snackPosition: SnackPosition.TOP,
         backgroundColor: const Color(0xFFD32F2F),
         colorText: Colors.white,
       );
-     
+
       return;
     }
 
@@ -231,14 +149,13 @@ class LeaveController extends GetxController {
         colorText: Colors.white,
       );
     } catch (e) {
-       Get.snackbar(
+      Get.snackbar(
         'Error',
         'Failed to delete leave request: $e',
         snackPosition: SnackPosition.TOP,
         backgroundColor: const Color(0xFFD32F2F),
         colorText: Colors.white,
       );
-     
     } finally {
       isLoading.value = false;
     }
@@ -259,14 +176,14 @@ class LeaveController extends GetxController {
     try {
       return await _leaveService.getLeaveStatistics(currentUserId.value);
     } catch (e) {
-       Get.snackbar(
+      Get.snackbar(
         'Error',
         'Failed to get leave statistics: $e',
         snackPosition: SnackPosition.TOP,
         backgroundColor: const Color(0xFFD32F2F),
         colorText: Colors.white,
       );
-     
+
       return {
         'total': 0,
         'approved': 0,
@@ -295,7 +212,7 @@ class LeaveController extends GetxController {
         excludeLeaveId: excludeLeaveId,
       );
     } catch (e) {
-        Get.snackbar(
+      Get.snackbar(
         'Error',
         'Failed to check overlapping leave: $e',
         snackPosition: SnackPosition.TOP,
@@ -310,8 +227,6 @@ class LeaveController extends GetxController {
     if (currentUserId.value.isNotEmpty) {
       // The stream will automatically update the list
       // This method can be used for manual refresh if needed
-    } else {
-      loadSampleData();
-    }
+    } else {}
   }
 }

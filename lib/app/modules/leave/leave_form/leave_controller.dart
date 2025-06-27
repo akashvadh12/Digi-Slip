@@ -165,10 +165,7 @@ class ApplyLeaveController extends GetxController {
     }
 
     if (files.isNotEmpty) {
-      _showSuccessSnackbar(
-        'Files Selected',
-        '${files.length} file(s) added',
-      );
+      _showSuccessSnackbar('Files Selected', '${files.length} file(s) added');
     }
   }
 
@@ -200,10 +197,7 @@ class ApplyLeaveController extends GetxController {
       List<String> documentUrls = await uploadFilesToFirebase();
       await _createLeaveApplication(documentUrls);
 
-      _showSuccessSnackbar(
-        'Success',
-        'Leave application submitted!',
-      );
+      _showSuccessSnackbar('Success', 'Leave application submitted!');
       clearForm();
       Get.off(() => LeaveRequestsScreen());
     } catch (e) {
@@ -220,7 +214,7 @@ class ApplyLeaveController extends GetxController {
     }
 
     if (fromDate.value == null || toDate.value == null) {
-      _showErrorSnackbar('Error', 'Please select both dates');
+      _showErrorSnackbar('Error', 'Please select travel dates');
       return false;
     }
 
@@ -242,20 +236,21 @@ class ApplyLeaveController extends GetxController {
 
     for (int i = 0; i < uploadedFiles.length; i++) {
       try {
-        String fileName = 
-          'students/${currentUserId.value}/leave/${DateTime.now().millisecondsSinceEpoch}_${uploadedFileNames[i]}';
+        String fileName =
+            'students/${currentUserId.value}/leave/${DateTime.now().millisecondsSinceEpoch}_${uploadedFileNames[i]}';
 
-        TaskSnapshot snapshot = await _storage.ref(fileName)
-          .putFile(uploadedFiles[i])
-          .whenComplete(() {});
+        TaskSnapshot snapshot = await _storage
+            .ref(fileName)
+            .putFile(uploadedFiles[i])
+            .whenComplete(() {});
 
         String downloadUrl = await snapshot.ref.getDownloadURL();
         downloadUrls.add(downloadUrl);
       } catch (e) {
         print('Error uploading ${uploadedFileNames[i]}: $e');
         _showErrorSnackbar(
-          'Upload Error', 
-          'Failed to upload ${uploadedFileNames[i]}'
+          'Upload Error',
+          'Failed to upload ${uploadedFileNames[i]}',
         );
       }
     }
@@ -281,10 +276,11 @@ class ApplyLeaveController extends GetxController {
       submittedBy: currentUserId.value,
     );
 
-    await _firestore.collection('students')
-      .doc(currentUserId.value)
-      .collection('leave')
-      .add(leaveApplication.toFirestore());
+    await _firestore
+        .collection('students')
+        .doc(currentUserId.value)
+        .collection('leave')
+        .add(leaveApplication.toFirestore());
   }
 
   // Overlapping Leave Validation
@@ -329,9 +325,14 @@ class ApplyLeaveController extends GetxController {
     }
   }
 
-  bool _datesOverlap(DateTime start1, DateTime end1, DateTime start2, DateTime end2) {
-    return start1.isBefore(end2.add(const Duration(days: 1))) && 
-           end1.isAfter(start2.subtract(const Duration(days: 1)));
+  bool _datesOverlap(
+    DateTime start1,
+    DateTime end1,
+    DateTime start2,
+    DateTime end2,
+  ) {
+    return start1.isBefore(end2.add(const Duration(days: 1))) &&
+        end1.isAfter(start2.subtract(const Duration(days: 1)));
   }
 
   // Utility Methods
@@ -355,7 +356,8 @@ class ApplyLeaveController extends GetxController {
     Get.snackbar(
       title,
       message,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
+      duration: Duration(seconds: 1),
       backgroundColor: const Color(0xFFD32F2F),
       colorText: Colors.white,
     );
@@ -365,7 +367,7 @@ class ApplyLeaveController extends GetxController {
     Get.snackbar(
       title,
       message,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       backgroundColor: const Color(0xFF4CAF50),
       colorText: Colors.white,
     );

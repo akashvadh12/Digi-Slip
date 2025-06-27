@@ -242,14 +242,6 @@ class HomeController extends GetxController {
       // Cancel leave applications subscription
       _leaveSubscription?.cancel();
 
-      // Clear SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.clear();
-
-      // Clear student data and leave applications
-      student.value = null;
-      recentLeaveApplications.clear();
-
       Get.to(LogoutPage());
       // Get.snackbar(
       //   'Logout',

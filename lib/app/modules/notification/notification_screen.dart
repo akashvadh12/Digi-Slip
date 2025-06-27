@@ -1,11 +1,16 @@
 // app/modules/notification/notification_screen.dart
 import 'package:digislips/app/core/theme/app_colors.dart';
+import 'package:digislips/app/modules/dashboard/dashboard.dart';
 import 'package:digislips/app/modules/notification/notification_controller.dart';
+import 'package:digislips/app/shared/widgets/bottomnavigation/navigation_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class NotificationScreen extends StatelessWidget {
   final NotificationController controller = Get.put(NotificationController());
+  final BottomNavController bottomNavController = Get.put(
+    BottomNavController(),
+  );
 
   NotificationScreen({Key? key}) : super(key: key);
 
@@ -33,7 +38,11 @@ class NotificationScreen extends StatelessWidget {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () => Get.back(),
+                    onTap: () {
+                      // Get.back();
+                      bottomNavController.changeBottomNavIndex(0);
+                    },
+
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(

@@ -127,7 +127,7 @@ class LoginController extends GetxController {
       message,
       backgroundColor: isSuccess ? AppColors.greenColor : AppColors.error,
       colorText: Colors.white,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2),
       snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(12),
     );

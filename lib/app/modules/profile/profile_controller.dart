@@ -28,9 +28,9 @@ class ProfileController extends GetxController {
   final phoneController = TextEditingController();
   final parentPhoneController = TextEditingController();
   final parentEmailController = TextEditingController();
-  final departmentController = TextEditingController();
+  // Removed departmentController as we're using dropdown
   var selectedSemester = '1st Semester'.obs;
-  var selectedDepartment = 'Computer Science'.obs; // Added for dropdown
+  var selectedDepartment = 'CS'.obs;
 
   // Available semesters
   final List<String> availableSemesters = [
@@ -44,16 +44,16 @@ class ProfileController extends GetxController {
     '8th Semester',
   ];
 
-  // Available departments (updated for dropdown)
+  // Available departments
   final List<String> availableDepartments = [
-    'Computer Science',
-    'Information Technology',
-    'Electronics',
-    'Mechanical',
-    'Civil',
-    'Electrical',
-    'Chemical',
-    'Others',
+    'CS',
+    'IT',
+    'ECE',
+    'EEE',
+    'MECH',
+    'CIVIL',
+    'CHEM',
+    'BIO',
   ];
 
   // Keep all existing getters
@@ -80,7 +80,7 @@ class ProfileController extends GetxController {
     phoneController.dispose();
     parentPhoneController.dispose();
     parentEmailController.dispose();
-    departmentController.dispose();
+    // Removed departmentController.dispose()
     super.onClose();
   }
 
@@ -136,8 +136,7 @@ class ProfileController extends GetxController {
       parentPhoneController.text = student.value!.parentPhone ?? '';
       parentEmailController.text = student.value!.parentEmail ?? '';
       selectedSemester.value = student.value!.semester;
-      selectedDepartment.value =
-          student.value!.department; // Set dropdown value
+      selectedDepartment.value = student.value!.department;
     }
   }
 
@@ -212,7 +211,7 @@ class ProfileController extends GetxController {
             ? null
             : parentEmailController.text.trim(),
         semester: selectedSemester.value,
-        department: selectedDepartment.value, // Use dropdown value
+        department: selectedDepartment.value,
       );
 
       await updateStudentData(updatedStudent);
@@ -245,31 +244,8 @@ class ProfileController extends GetxController {
     }
   }
 
-  // New method for department dropdown
-  Widget buildDepartmentDropdown() {
-    return Obx(
-      () => DropdownButtonFormField<String>(
-        value: selectedDepartment.value,
-        decoration: InputDecoration(
-          labelText: 'Department',
-          border: OutlineInputBorder(),
-        ),
-        items: availableDepartments.map((String department) {
-          return DropdownMenuItem<String>(
-            value: department,
-            child: Text(department),
-          );
-        }).toList(),
-        onChanged: isEditingProfile.value
-            ? (String? newValue) {
-                if (newValue != null) {
-                  selectedDepartment.value = newValue;
-                }
-              }
-            : null,
-      ),
-    );
-  }
+  // Removed the buildDepartmentDropdown method since department selection
+  // will be handled directly in the UI like semester selection
 
   // Existing methods remain unchanged below this point
   Future<void> updateParentInfo({
