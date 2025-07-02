@@ -371,18 +371,30 @@ class LeaveRequestsScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Reason',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.greyColor,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    request.reason,
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.blackColor,
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Reason',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.greyColor,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 54,
+                      ), // spacing between label and text
+                      Expanded(
+                        // Ensures text can wrap within available space
+                        child: Text(
+                          request.reason,
+                          style: AppTextStyles.body.copyWith(
+                            color: AppColors.blackColor,
+                          ),
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

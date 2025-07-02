@@ -493,9 +493,9 @@ This policy is effective as of the last updated date and will remain in effect e
   }
 
   // Refresh profile data
-  Future<void> refreshProfile() async {
-    await fetchStudentData();
-  }
+  // Future<void> refreshProfile() async {
+  //   await fetchStudentData();
+  // }
 
   // Helper methods for snackbars
   void _showSuccessSnackbar(String title, String message) {

@@ -152,21 +152,22 @@ class SettingsScreen extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          GestureDetector(
-            onTap: controller.refreshProfile,
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.3),
-                  width: 1,
-                ),
-              ),
-              child: const Icon(Icons.refresh, color: Colors.white, size: 18),
-            ),
-          ),
+          //uncomment to add refresh option
+          // GestureDetector(
+          //   onTap: controller.refreshProfile,
+          //   child: Container(
+          //     padding: const EdgeInsets.all(10),
+          //     decoration: BoxDecoration(
+          //       color: Colors.white.withOpacity(0.2),
+          //       borderRadius: BorderRadius.circular(12),
+          //       border: Border.all(
+          //         color: Colors.white.withOpacity(0.3),
+          //         width: 1,
+          //       ),
+          //     ),
+          //     child: const Icon(Icons.refresh, color: Colors.white, size: 18),
+          //   ),
+          // ),
         ],
       ),
     );
