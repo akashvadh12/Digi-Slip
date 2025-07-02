@@ -15,6 +15,10 @@ Widget _buildEnhancedLeaveApplicationCard(LeaveApplication leave) {
       statusColor = Colors.orange;
       statusIcon = Icons.schedule_outlined;
       break;
+    case 'partially approved':
+      statusColor = Colors.amber;
+      statusIcon = Icons.help_outline;
+      break;
     case 'rejected':
       statusColor = Colors.red;
       statusIcon = Icons.cancel_outlined;
@@ -91,7 +95,7 @@ Widget _buildEnhancedLeaveApplicationCard(LeaveApplication leave) {
                   Icon(statusIcon, size: 16, color: statusColor),
                   const SizedBox(width: 6),
                   Text(
-                    leave.status,
+                    _getDisplayStatus(leave.status),
                     style: TextStyle(
                       color: statusColor,
                       fontSize: 12,
@@ -127,10 +131,7 @@ Widget _buildEnhancedLeaveApplicationCard(LeaveApplication leave) {
                 const SizedBox(height: 4),
                 Text(
                   leave.reason!,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[800],
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey[800]),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -141,4 +142,20 @@ Widget _buildEnhancedLeaveApplicationCard(LeaveApplication leave) {
       ],
     ),
   );
+}
+
+// Helper method to get proper display text for status
+String _getDisplayStatus(String status) {
+  switch (status.toLowerCase()) {
+    case 'approved':
+      return 'Approved';
+    case 'pending':
+      return 'Pending';
+    case 'partially approved':
+      return 'Partially Approved';
+    case 'rejected':
+      return 'Rejected';
+    default:
+      return status;
+  }
 }

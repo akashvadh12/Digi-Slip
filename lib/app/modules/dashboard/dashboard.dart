@@ -327,17 +327,50 @@ class HomeView extends GetView<HomeController> {
                                               ),
                                             ),
                                             const SizedBox(width: 6),
-                                            Text(
-                                              controller.isProfileComplete
-                                                  ? 'Complete'
-                                                  : 'Incomplete',
-                                              style: TextStyle(
-                                                color:
-                                                    controller.isProfileComplete
-                                                    ? Colors.green[700]
-                                                    : Colors.orange[700],
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
+                                            GestureDetector(
+                                              onTap: () {
+                                                if (!controller
+                                                    .isProfileComplete) {
+                                                  Get.snackbar(
+                                                    'Incomplete Profile ⚠️',
+                                                    'Please complete your parent details (email & phone).',
+                                                    snackPosition:
+                                                        SnackPosition.TOP,
+                                                    backgroundColor:
+                                                        Colors.orange.shade100,
+                                                    colorText: Colors.black,
+                                                    duration: Duration(
+                                                      seconds: 3,
+                                                    ),
+                                                  );
+                                                } else {
+                                                  Get.snackbar(
+                                                    'Profile Status ✅',
+                                                    'Your profile is complete. Good job!',
+                                                    snackPosition:
+                                                        SnackPosition.TOP,
+                                                    backgroundColor:
+                                                        Colors.green.shade100,
+                                                    colorText: Colors.black,
+                                                    duration: Duration(
+                                                      seconds: 2,
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              child: Text(
+                                                controller.isProfileComplete
+                                                    ? 'Complete'
+                                                    : 'Incomplete',
+                                                style: TextStyle(
+                                                  color:
+                                                      controller
+                                                          .isProfileComplete
+                                                      ? Colors.green[700]
+                                                      : Colors.orange[700],
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -576,10 +609,17 @@ class HomeView extends GetView<HomeController> {
         statusColor = Colors.green;
         statusIcon = Icons.check_circle_outline;
         break;
+      case 'partially approved':
+        statusColor = AppColors.greyColor;
+
+        statusIcon = Icons.help_outline;
+
+        break;
       case 'pending':
         statusColor = Colors.orange;
         statusIcon = Icons.schedule_outlined;
         break;
+
       case 'rejected':
         statusColor = Colors.red;
         statusIcon = Icons.cancel_outlined;

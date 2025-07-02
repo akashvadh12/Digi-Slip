@@ -71,8 +71,8 @@ class LogoutController extends GetxController with GetTickerProviderStateMixin {
     Get.snackbar(
       'Success',
       'You have been logged out successfully',
-      backgroundColor: AppColors.success.withOpacity(0.1),
-      colorText: AppColors.success,
+      backgroundColor: AppColors.success,
+      colorText: AppColors.background,
       snackPosition: SnackPosition.TOP,
       margin: EdgeInsets.all(16),
       borderRadius: 12,

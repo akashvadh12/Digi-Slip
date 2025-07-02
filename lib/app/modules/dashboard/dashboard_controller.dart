@@ -1,5 +1,6 @@
 // app/modules/home/controllers/home_controller.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/modules/auth/models/user_model.dart';
 import 'package:digislips/app/modules/dashboard/dashboard.dart';
 import 'package:digislips/app/modules/leave/leave_form/leave_form_page.dart';
@@ -45,6 +46,8 @@ class LeaveApplication {
         break;
       case 'rejected':
         statusColor = const Color(0xFFD32F2F);
+      case 'Partially Approved':
+        statusColor = AppColors.greyColor;
         break;
       default:
         statusColor = Colors.orange;
@@ -127,6 +130,7 @@ class HomeController extends GetxController {
 
       if (docSnapshot.exists) {
         student.value = Student.fromMap(docSnapshot.data()!);
+        print("this is value of student :- ${student.value}");
         // Fetch leave applications after student data is loaded
         _fetchRecentLeaveApplications(uid);
       } else {
@@ -267,5 +271,31 @@ class HomeController extends GetxController {
   String get studentPhone => student.value?.phone ?? '';
   String get studentSemester => student.value?.semester ?? '';
   String? get profileImageUrl => student.value?.profileImageUrl;
-  bool get isProfileComplete => student.value?.profileComplete ?? false;
+  bool get isProfileComplete {
+    final s = student.value;
+
+    if (s == null) {
+      print("🟥 Student data not loaded yet.");
+      return false;
+    }
+
+    final hasParentEmail =
+        s.parentEmail != null && s.parentEmail!.trim().isNotEmpty;
+    final hasParentPhone =
+        s.parentPhone != null && s.parentPhone!.trim().isNotEmpty;
+
+    if (hasParentEmail && hasParentPhone) {
+      print(
+        "✅ Profile Complete! 🎉 Parent Email: ${s.parentEmail}, Parent Phone: ${s.parentPhone}",
+      );
+      return true;
+    } else {
+      print(
+        "⚠️ Profile Incomplete! Missing: "
+        "${!hasParentEmail ? 'Parent Email ❌ ' : ''}"
+        "${!hasParentPhone ? 'Parent Phone ❌' : ''}",
+      );
+      return false;
+    }
+  }
 }

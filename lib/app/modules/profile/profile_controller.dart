@@ -174,7 +174,6 @@ class ProfileController extends GetxController {
         return;
       }
 
-      // Updated phone validation message
       if (!_isValidPhone(phoneController.text.trim())) {
         _showErrorSnackbar(
           'Validation Error',
@@ -213,6 +212,15 @@ class ProfileController extends GetxController {
         semester: selectedSemester.value,
         department: selectedDepartment.value,
       );
+
+      // ✅ Prevent saving if no changes were made
+      if (updatedStudent == student.value) {
+        _showErrorSnackbar(
+          'No Changes',
+          'No changes were made to your profile.',
+        );
+        return;
+      }
 
       await updateStudentData(updatedStudent);
       isEditingProfile.value = false;
@@ -302,8 +310,8 @@ class ProfileController extends GetxController {
     Get.snackbar(
       'Change Password',
       'Navigating to change password...',
-      backgroundColor: AppColors.secondary.withOpacity(0.1),
-      colorText: AppColors.secondary,
+      backgroundColor: AppColors.secondary,
+      colorText: AppColors.background,
       snackPosition: SnackPosition.TOP,
       margin: EdgeInsets.all(16),
       borderRadius: 12,
@@ -353,8 +361,8 @@ class ProfileController extends GetxController {
                   Get.snackbar(
                     'Logged Out',
                     'You have been successfully logged out',
-                    backgroundColor: AppColors.error.withOpacity(0.1),
-                    colorText: AppColors.error,
+                    backgroundColor: AppColors.error,
+                    colorText: AppColors.whiteColor,
                     snackPosition: SnackPosition.TOP,
                     margin: EdgeInsets.all(16),
                     borderRadius: 12,
@@ -396,8 +404,8 @@ class ProfileController extends GetxController {
     Get.snackbar(
       title,
       message,
-      backgroundColor: AppColors.error.withOpacity(0.1),
-      colorText: AppColors.error,
+      backgroundColor: AppColors.error,
+      colorText: AppColors.whiteColor,
       snackPosition: SnackPosition.TOP,
       margin: EdgeInsets.all(16),
       borderRadius: 12,

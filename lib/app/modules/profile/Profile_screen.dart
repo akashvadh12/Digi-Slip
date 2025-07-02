@@ -273,7 +273,7 @@ class ProfileScreen extends StatelessWidget {
       children: [
         // Personal & Contact Information Card
         _buildInfoCard(
-          title: 'Personal & Contact Information',
+          title: 'User Details',
 
           icon: Icons.badge_outlined,
           children: [
@@ -353,8 +353,8 @@ class ProfileScreen extends StatelessWidget {
       children: [
         // Personal & Contact Information Edit Card
         _buildEditCard(
-          title: 'Personal & Contact Information',
-          icon: Icons.person_outline,
+          title: 'User Details',
+          icon: Icons.badge_outlined,
           children: [
             _buildEditField(
               'Full Name',
@@ -466,7 +466,7 @@ class ProfileScreen extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: AppColors.blackColor,
                 ),
@@ -818,7 +818,7 @@ class ProfileScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
-                    Icons.school_outlined,
+                    Icons.chrome_reader_mode,
                     color: AppColors.pendingColor,
                     size: 18,
                   ),

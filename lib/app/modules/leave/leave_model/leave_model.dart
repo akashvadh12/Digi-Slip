@@ -13,6 +13,7 @@ class LeaveModel {
   final String travelMode;
   final List<String> documentUrls;
   final String status;
+  final String? leav_id;
   final DateTime submittedAt;
   final String submittedBy;
   final String? reviewedBy;
@@ -31,6 +32,7 @@ class LeaveModel {
     this.travelMode = '',
     this.documentUrls = const [],
     this.status = 'Pending',
+    this.leav_id,
     required this.submittedAt,
     required this.submittedBy,
     this.reviewedBy,

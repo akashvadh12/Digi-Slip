@@ -140,33 +140,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ),
 
-                        // child: Container(
-                        //   width: 100,
-                        //   height: 100,
-                        //   decoration: BoxDecoration(
-                        //     gradient: LinearGradient(
-                        //       colors: [
-                        //         AppColors.primary,
-                        //         AppColors.primary.withOpacity(0.8),
-                        //       ],
-                        //       begin: Alignment.topLeft,
-                        //       end: Alignment.bottomRight,
-                        //     ),
-                        //     borderRadius: BorderRadius.circular(25),
-                        //     boxShadow: [
-                        //       BoxShadow(
-                        //         color: AppColors.primary.withOpacity(0.3),
-                        //         blurRadius: 20,
-                        //         offset: Offset(0, 10),
-                        //       ),
-                        //     ],
-                        //   ),
-                        //   child: Icon(
-                        //     Icons.school_outlined,
-                        //     color: Colors.white,
-                        //     size: 50,
-                        //   ),
-                        // ),
+                       
                       );
                     },
                   ),

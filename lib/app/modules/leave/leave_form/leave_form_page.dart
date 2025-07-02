@@ -106,7 +106,7 @@ class ApplyLeaveView extends GetView<ApplyLeaveController> {
 
                       // Compact Travel Dates
                       _buildCompactSectionHeader(
-                        'Travel Dates',
+                        'Leave Dates',
                         Icons.date_range_rounded,
                       ),
                       const SizedBox(height: 8),
