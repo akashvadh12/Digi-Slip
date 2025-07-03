@@ -163,6 +163,13 @@ class ProfileController extends GetxController {
     return RegExp(r'^[0-9]{10}$').hasMatch(phone);
   }
 
+  // NEW: Validation to check if parent email is same as student email
+  bool _isSameAsStudentEmail(String parentEmail) {
+    if (student.value == null) return false;
+    return parentEmail.trim().toLowerCase() ==
+        student.value!.email.trim().toLowerCase();
+  }
+
   Future<void> saveProfileChanges() async {
     if (student.value == null) return;
 
@@ -196,6 +203,16 @@ class ProfileController extends GetxController {
         _showErrorSnackbar(
           'Validation Error',
           'Please enter a valid parent email address',
+        );
+        return;
+      }
+
+      // NEW: Check if parent email is same as student email
+      if (parentEmailController.text.trim().isNotEmpty &&
+          _isSameAsStudentEmail(parentEmailController.text.trim())) {
+        _showErrorSnackbar(
+          'Validation Error',
+          'Parent email cannot be the same as student email',
         );
         return;
       }
@@ -255,7 +272,7 @@ class ProfileController extends GetxController {
   // Removed the buildDepartmentDropdown method since department selection
   // will be handled directly in the UI like semester selection
 
-  // Existing methods remain unchanged below this point
+  // Updated updateParentInfo method with the same validation
   Future<void> updateParentInfo({
     required String parentPhone,
     required String parentEmail,
@@ -277,6 +294,16 @@ class ProfileController extends GetxController {
         _showErrorSnackbar(
           'Validation Error',
           'Please enter a valid parent email address',
+        );
+        return;
+      }
+
+      // NEW: Check if parent email is same as student email
+      if (parentEmail.trim().isNotEmpty &&
+          _isSameAsStudentEmail(parentEmail.trim())) {
+        _showErrorSnackbar(
+          'Validation Error',
+          'Parent email cannot be the same as student email',
         );
         return;
       }
