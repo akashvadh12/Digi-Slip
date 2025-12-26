@@ -257,7 +257,7 @@ class HomeView extends GetView<HomeController> {
                         children: [
                           _buildEnhancedActionCard(
                             icon: Icons.add_circle_outline,
-                            title: 'Apply for Leave',
+                            title: 'Apply Leave',
                             subtitle: 'Request new leave',
                             gradient: [Colors.blue[400]!, Colors.blue[600]!],
                             onTap: controller.onApplyForLeave,
@@ -379,7 +379,7 @@ class HomeView extends GetView<HomeController> {
               ),
               child: Icon(icon, size: 28, color: Colors.white),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
               title,
               style: const TextStyle(

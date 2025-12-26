@@ -1,12 +1,8 @@
-import 'package:digislips/app/core/theme/app_them.dart';
-import 'package:digislips/app/modules/auth/login/login_page.dart';
 import 'package:digislips/app/routes/app_pages.dart';
-import 'package:digislips/app/shared/widgets/bottomnavigation/bottomnavigation.dart';
 import 'package:digislips/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {

@@ -12,89 +12,48 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
+      appBar: _buildAppBar(),
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Column(
           children: [
-            _buildHeader(),
-            Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                  children: [
-                    _buildProfileCard(),
-                    SizedBox(height: 24),
-                    _buildPersonalDetailsCard(),
-                    SizedBox(height: 24),
-                    _buildAcademicDetailsCard(),
-                    SizedBox(height: 24),
-                    _buildActionButtons(),
-                    SizedBox(height: 32),
-                  ],
-                ),
-              ),
-            ),
+            _buildProfileCard(),
+            SizedBox(height: 24),
+            _buildPersonalDetailsCard(),
+            SizedBox(height: 24),
+            _buildAcademicDetailsCard(),
+            SizedBox(height: 24),
+            _buildActionButtons(),
+            SizedBox(height: 32),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.2),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () => Get.back(),
-              child: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.arrow_back_ios_new,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Text(
-                'My Profile',
-                style: AppTextStyles.welcomeTitle.copyWith(fontSize: 22),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            GestureDetector(
-              onTap: controller.editProfile,
-              child: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.edit_outlined,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ),
-          ],
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: AppColors.primary,
+      title: Text(
+        'My Profile',
+        style: AppTextStyles.welcomeTitle.copyWith(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
         ),
       ),
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+        onPressed: () => Get.back(),
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.edit_outlined, color: Colors.white, size: 20),
+          onPressed: controller.editProfile,
+        ),
+        const SizedBox(width: 8),
+      ],
     );
   }
 
@@ -154,7 +113,7 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 0,
+            top: 15,
             left: 0,
             right: 0,
             child: Center(

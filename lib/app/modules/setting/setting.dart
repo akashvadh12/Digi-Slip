@@ -1,12 +1,8 @@
-import 'dart:ui';
-
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/core/theme/app_text_styles.dart';
 import 'package:digislips/app/modules/setting/setting_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 class SettingsScreen extends StatelessWidget {
   final SettingsController controller = Get.put(SettingsController());
@@ -17,84 +13,48 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
+      appBar: _buildAppBar(),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
-            // Custom App Bar
-            _buildAppBar(),
+            const SizedBox(height: 20),
 
-            // Settings Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20),
+            // Profile Card
+            _buildProfileCard(),
 
-                    // Profile Card
-                    _buildProfileCard(),
+            const SizedBox(height: 30),
 
-                    const SizedBox(height: 30),
+            // Settings Options
+            _buildSettingsCard(),
 
-                    // Settings Options
-                    _buildSettingsCard(),
+            const SizedBox(height: 30),
 
-                    const SizedBox(height: 30),
+            // Logout Button
+            _buildLogoutButton(),
 
-                    // Logout Button
-                    _buildLogoutButton(),
-
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
-            ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAppBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(20),
-          bottomRight: Radius.circular(20),
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: AppColors.primary,
+      title: Text(
+        'Settings',
+        style: AppTextStyles.welcomeTitle.copyWith(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () => Get.back(),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_ios_new,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            const Text(
-              'Settings',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-                letterSpacing: -0.5,
-              ),
-            ),
-          ],
-        ),
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+        onPressed: () => Get.back(),
       ),
     );
   }

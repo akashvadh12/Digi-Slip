@@ -130,10 +130,9 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                             ],
                           ),
-                          child: Icon(
-                            Icons.school_outlined,
-                            color: Colors.white,
-                            size: 50,
+                          child: Image.asset(
+                            'assets/logo/DigiSlips.png',
+                            fit: BoxFit.contain,
                           ),
                         ),
                       );
