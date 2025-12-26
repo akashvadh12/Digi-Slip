@@ -114,12 +114,11 @@ class RegistrationController extends GetxController {
 
   Future<bool> _isRollNumberExists(String rollNumber, String department) async {
     try {
-      final querySnapshot =
-          await _firestore
-              .collection('students')
-              .where('rollNumber', isEqualTo: rollNumber.trim())
-              .where('department', isEqualTo: department)
-              .get();
+      final querySnapshot = await _firestore
+          .collection('students')
+          .where('rollNumber', isEqualTo: rollNumber.trim())
+          .where('department', isEqualTo: department)
+          .get();
 
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
@@ -151,11 +150,10 @@ class RegistrationController extends GetxController {
 
   Future<bool> _isEmailExists(String email) async {
     try {
-      final querySnapshot =
-          await _firestore
-              .collection('students')
-              .where('email', isEqualTo: email.trim())
-              .get();
+      final querySnapshot = await _firestore
+          .collection('students')
+          .where('email', isEqualTo: email.trim())
+          .get();
 
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
@@ -182,7 +180,7 @@ class RegistrationController extends GetxController {
           'Roll number already exists in ${selectedDepartment.value} department',
           backgroundColor: AppColors.error,
           colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+          snackPosition: SnackPosition.TOP,
           margin: const EdgeInsets.all(16),
           borderRadius: 12,
         );
@@ -197,7 +195,7 @@ class RegistrationController extends GetxController {
           'An account with this email already exists',
           backgroundColor: AppColors.error,
           colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+          snackPosition: SnackPosition.TOP,
           margin: const EdgeInsets.all(16),
           borderRadius: 12,
         );
@@ -218,7 +216,7 @@ class RegistrationController extends GetxController {
           'Failed to create user',
           backgroundColor: AppColors.error,
           colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+          snackPosition: SnackPosition.TOP,
           margin: const EdgeInsets.all(16),
           borderRadius: 12,
         );
@@ -237,6 +235,7 @@ class RegistrationController extends GetxController {
       // Prepare student model
       final student = Student(
         uid: userCredential.user!.uid,
+
         fullName: fullNameController.text.trim(),
         email: email,
         phone: phoneController.text.trim(),
@@ -268,7 +267,7 @@ class RegistrationController extends GetxController {
         'Please login to verify your account',
         backgroundColor: Colors.green,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
         duration: const Duration(seconds: 5),
@@ -302,7 +301,7 @@ class RegistrationController extends GetxController {
         errorMessage,
         backgroundColor: AppColors.error,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
       );
@@ -312,7 +311,7 @@ class RegistrationController extends GetxController {
         'An unexpected error occurred: ${e.toString()}',
         backgroundColor: AppColors.error,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
       );
@@ -340,11 +339,11 @@ class RegistrationController extends GetxController {
 
     if (firstError != null) {
       Get.snackbar(
-        'Validation Error',
+        'Required fields are missing',
         firstError,
         backgroundColor: AppColors.error,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
       );

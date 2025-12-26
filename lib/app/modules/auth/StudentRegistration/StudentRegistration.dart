@@ -32,7 +32,11 @@ class StudentRegistrationScreen extends StatelessWidget {
                   SizedBox(height: 8),
                   Text(
                     'Join our academic community',
-                    style: AppTextStyles.welcomeTitle,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -172,7 +176,8 @@ class StudentRegistrationScreen extends StatelessWidget {
                             controller: controller.passwordController,
                             hintText: 'Create a strong password',
                             isObscured: controller.isPasswordHidden.value,
-                            onToggleVisibility: controller.togglePasswordVisibility,
+                            onToggleVisibility:
+                                controller.togglePasswordVisibility,
                           ),
                         ),
 
@@ -184,8 +189,10 @@ class StudentRegistrationScreen extends StatelessWidget {
                             label: 'Confirm Password',
                             controller: controller.confirmPasswordController,
                             hintText: 'Re-enter your password',
-                            isObscured: controller.isConfirmPasswordHidden.value,
-                            onToggleVisibility: controller.toggleConfirmPasswordVisibility,
+                            isObscured:
+                                controller.isConfirmPasswordHidden.value,
+                            onToggleVisibility:
+                                controller.toggleConfirmPasswordVisibility,
                           ),
                         ),
 
@@ -214,26 +221,36 @@ class StudentRegistrationScreen extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: 8),
-                              Obx(() => _buildPasswordRequirement(
-                                'At least 8 characters',
-                                controller.hasMinLength.value,
-                              )),
-                              Obx(() => _buildPasswordRequirement(
-                                'At least one uppercase letter',
-                                controller.hasUppercase.value,
-                              )),
-                              Obx(() => _buildPasswordRequirement(
-                                'At least one lowercase letter',
-                                controller.hasLowercase.value,
-                              )),
-                              Obx(() => _buildPasswordRequirement(
-                                'At least one number',
-                                controller.hasNumber.value,
-                              )),
-                              Obx(() => _buildPasswordRequirement(
-                                'At least one special character',
-                                controller.hasSpecialChar.value,
-                              )),
+                              Obx(
+                                () => _buildPasswordRequirement(
+                                  'At least 8 characters',
+                                  controller.hasMinLength.value,
+                                ),
+                              ),
+                              Obx(
+                                () => _buildPasswordRequirement(
+                                  'At least one uppercase letter',
+                                  controller.hasUppercase.value,
+                                ),
+                              ),
+                              Obx(
+                                () => _buildPasswordRequirement(
+                                  'At least one lowercase letter',
+                                  controller.hasLowercase.value,
+                                ),
+                              ),
+                              Obx(
+                                () => _buildPasswordRequirement(
+                                  'At least one number',
+                                  controller.hasNumber.value,
+                                ),
+                              ),
+                              Obx(
+                                () => _buildPasswordRequirement(
+                                  'At least one special character',
+                                  controller.hasSpecialChar.value,
+                                ),
+                              ),
                             ],
                           ),
                         ),

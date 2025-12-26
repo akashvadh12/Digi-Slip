@@ -38,12 +38,10 @@ class LogoutController extends GetxController with GetTickerProviderStateMixin {
       duration: Duration(milliseconds: 1000),
       vsync: this,
     );
-    slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: slideController, curve: Curves.elasticOut),
-    );
+    slideAnimation = Tween<Offset>(begin: Offset(0, 0.3), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: slideController, curve: Curves.elasticOut),
+        );
 
     // Pulse animation for logout icon
     pulseController = AnimationController(
@@ -73,8 +71,8 @@ class LogoutController extends GetxController with GetTickerProviderStateMixin {
     Get.snackbar(
       'Success',
       'You have been logged out successfully',
-      backgroundColor: AppColors.success.withOpacity(0.1),
-      colorText: AppColors.success,
+      backgroundColor: AppColors.success,
+      colorText: AppColors.background,
       snackPosition: SnackPosition.TOP,
       margin: EdgeInsets.all(16),
       borderRadius: 12,
@@ -94,16 +92,6 @@ class LogoutController extends GetxController with GetTickerProviderStateMixin {
 
   void cancelLogout() {
     Get.back();
-    Get.snackbar(
-      'Cancelled',
-      'Logout cancelled',
-      backgroundColor: AppColors.greyColor.withOpacity(0.1),
-      colorText: AppColors.greyColor,
-      snackPosition: SnackPosition.TOP,
-      margin: EdgeInsets.all(16),
-      borderRadius: 12,
-      duration: Duration(seconds: 1),
-    );
   }
 
   @override

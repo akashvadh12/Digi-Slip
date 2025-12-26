@@ -127,8 +127,8 @@ class LoginController extends GetxController {
       message,
       backgroundColor: isSuccess ? AppColors.greenColor : AppColors.error,
       colorText: Colors.white,
-      duration: const Duration(seconds: 3),
-      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
+      snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(12),
     );
   }
@@ -146,8 +146,10 @@ class LoginController extends GetxController {
 
     final errorMessage =
         errorMessages[e.code] ?? (e.message ?? 'Login failed. Try again.');
-
-    _showSnackbar('Error', errorMessage);
+    _showSnackbar(
+      'Login error',
+      'Please check your credentials and try again.',
+    );
   }
 
   @override

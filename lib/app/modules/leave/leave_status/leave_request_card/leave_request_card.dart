@@ -1,12 +1,12 @@
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/core/theme/app_text_styles.dart';
-import 'package:digislips/app/modules/leave/leave_status/leave_model/leave_model.dart';
+import 'package:digislips/app/modules/leave/leave_model/leave_model.dart';
 import 'package:digislips/app/modules/leave/leave_status/leave_status_chip/leave_status_chip.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class LeaveRequestCard extends StatelessWidget {
-  final LeaveRequest leaveRequest;
+  final LeaveModel leaveRequest;
   final VoidCallback? onTap;
 
   const LeaveRequestCard({
@@ -67,7 +67,7 @@ class LeaveRequestCard extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              leaveRequest.type,
+                              leaveRequest.leaveType,
                               style: AppTextStyles.title.copyWith(
                                 fontSize: 16,
                               ),
@@ -97,7 +97,7 @@ class LeaveRequestCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        dateFormat.format(leaveRequest.startDate),
+                        dateFormat.format(leaveRequest.fromDate),
                         style: AppTextStyles.bodyMedium.copyWith(
                           fontSize: 13,
                         ),
@@ -111,7 +111,7 @@ class LeaveRequestCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        dateFormat.format(leaveRequest.endDate),
+                        dateFormat.format(leaveRequest.toDate),
                         style: AppTextStyles.bodyMedium.copyWith(
                           fontSize: 13,
                         ),
@@ -124,7 +124,7 @@ class LeaveRequestCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          '${leaveRequest.duration} ${leaveRequest.duration == 1 ? 'day' : 'days'}',
+                          '${leaveRequest.totalDays} ${leaveRequest.totalDays == 1 ? 'day' : 'days'}',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -139,7 +139,8 @@ class LeaveRequestCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 
                 if (leaveRequest.status.toLowerCase() == 'rejected' && 
-                    leaveRequest.rejectionReason != null) ...[
+                    leaveRequest.reviewComments != null && 
+                    leaveRequest.reviewComments!.isNotEmpty) ...[
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -172,7 +173,7 @@ class LeaveRequestCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          leaveRequest.rejectionReason!,
+                          leaveRequest.reviewComments!,
                           style: AppTextStyles.body.copyWith(
                             fontSize: 13,
                             color: AppColors.blackColor,
@@ -204,11 +205,72 @@ class LeaveRequestCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Submitted on ${dateFormat.format(leaveRequest.submissionDate)}',
+                      'Submitted on ${dateFormat.format(leaveRequest.submittedAt)}',
                       style: AppTextStyles.caption,
                     ),
                   ],
                 ),
+
+                // Show destination if available
+                if (leaveRequest.destination.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 14,
+                        color: AppColors.greyColor,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          'Destination: ${leaveRequest.destination}',
+                          style: AppTextStyles.caption,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+
+                // Show travel mode if available
+                if (leaveRequest.travelMode.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.directions,
+                        size: 14,
+                        color: AppColors.greyColor,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Travel: ${leaveRequest.travelMode}',
+                        style: AppTextStyles.caption,
+                      ),
+                    ],
+                  ),
+                ],
+
+                // Show documents if available
+                if (leaveRequest.documentUrls.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.attach_file,
+                        size: 14,
+                        color: AppColors.greyColor,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${leaveRequest.documentUrls.length} ${leaveRequest.documentUrls.length == 1 ? 'document' : 'documents'} attached',
+                        style: AppTextStyles.caption,
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -218,7 +280,7 @@ class LeaveRequestCard extends StatelessWidget {
   }
 
   Color _getLeaveTypeColor() {
-    switch (leaveRequest.type.toLowerCase()) {
+    switch (leaveRequest.leaveType.toLowerCase()) {
       case 'sick leave':
         return AppColors.error;
       case 'vacation leave':
@@ -235,7 +297,7 @@ class LeaveRequestCard extends StatelessWidget {
   }
 
   IconData _getLeaveTypeIcon() {
-    switch (leaveRequest.type.toLowerCase()) {
+    switch (leaveRequest.leaveType.toLowerCase()) {
       case 'sick leave':
         return Icons.medical_services;
       case 'vacation leave':

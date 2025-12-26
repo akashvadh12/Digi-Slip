@@ -19,26 +19,19 @@ class ApplyLeaveView extends GetView<ApplyLeaveController> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
+            // Compact Header
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
                     AppColors.primary,
-                    AppColors.primary.withOpacity(0.8),
+                    AppColors.primary.withOpacity(0.85),
                   ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
               ),
               child: Row(
                 children: [
@@ -47,83 +40,111 @@ class ApplyLeaveView extends GetView<ApplyLeaveController> {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
                       ),
                       child: const Icon(
-                        Icons.arrow_back_ios,
+                        Icons.arrow_back_ios_new_rounded,
                         color: Colors.white,
-                        size: 20,
+                        size: 18,
                       ),
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Text(
-                    'Apply for Leave',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Apply for Leave',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Request time off with ease',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
 
-            // Body with curved top
+            // Compact Body
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
                   ),
                 ),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Leave Type Section
-                      _buildSectionTitle('Leave Type'),
-                      const SizedBox(height: 16),
-                      _buildLeaveTypeSelector(),
-
-                      const SizedBox(height: 32),
-
-                      // Travel Dates Section
-                      _buildSectionTitle('Travel Dates'),
-                      const SizedBox(height: 16),
-                      _buildDateSelectors(),
-
-                      const SizedBox(height: 32),
-
-                      // Reason Section
-                      _buildSectionTitle('Reason for Leave'),
-                      const SizedBox(height: 16),
-                      _buildReasonField(),
-
-                      const SizedBox(height: 32),
-
-                      // Destination & Travel Mode Section
-                      _buildSectionTitle('Destination & Travel Mode'),
-                      const SizedBox(height: 16),
-                      _buildDestinationFields(),
-
-                      const SizedBox(height: 32),
-
-                      // Supporting Documents Section
-                      _buildSectionTitle('Supporting Documents'),
-                      const SizedBox(height: 16),
-                      _buildDocumentUpload(),
-
-                      const SizedBox(height: 40),
-
-                      // Submit Button
-                      _buildSubmitButton(),
+                      // Leave Type Dropdown
+                      _buildCompactSectionHeader(
+                        'Leave Type',
+                        Icons.category_rounded,
+                      ),
+                      const SizedBox(height: 8),
+                      _buildLeaveTypeDropdown(),
 
                       const SizedBox(height: 20),
+
+                      // Compact Travel Dates
+                      _buildCompactSectionHeader(
+                        'Leave Dates',
+                        Icons.date_range_rounded,
+                      ),
+                      const SizedBox(height: 8),
+                      _buildCompactDateSelectors(),
+
+                      const SizedBox(height: 20),
+
+                      // Compact Reason Field
+                      _buildCompactSectionHeader(
+                        'Reason for Leave',
+                        Icons.edit_note_rounded,
+                      ),
+                      const SizedBox(height: 8),
+                      _buildCompactReasonField(),
+
+                      const SizedBox(height: 20),
+
+                      // Travel Information in Row
+                      _buildCompactSectionHeader(
+                        'Travel Information',
+                        Icons.flight_takeoff_rounded,
+                      ),
+                      const SizedBox(height: 8),
+                      _buildCompactTravelFields(),
+                      // uncomment to add documents
+                      // const SizedBox(height: 20),
+
+                      // Compact Document Upload
+                      // _buildCompactSectionHeader(
+                      //   'Supporting Documents',
+                      //   Icons.cloud_upload_rounded,
+                      // ),
+                      // const SizedBox(height: 8),
+                      // _buildCompactDocumentUpload(),
+                      const SizedBox(height: 24),
+
+                      // Submit Button
+                      _buildCompactSubmitButton(),
                     ],
                   ),
                 ),
@@ -135,78 +156,175 @@ class ApplyLeaveView extends GetView<ApplyLeaveController> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: AppTextStyles.hint.copyWith(
-        color: AppColors.blackColor,
-        fontSize: 18,
-      ),
+  Widget _buildCompactSectionHeader(String title, IconData icon) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: AppColors.primary, size: 16),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: TextStyle(
+            color: AppColors.blackColor,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildLeaveTypeSelector() {
-    return Obx(
-      () => Row(
-        children: controller.leaveTypes.map((type) {
-          bool isSelected = controller.selectedLeaveType.value == type;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => controller.selectLeaveType(type),
-              child: Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 12,
+  Widget _buildLeaveTypeDropdown() {
+    return Obx(() {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: controller.selectedLeaveType.value.isEmpty
+                ? null
+                : controller.selectedLeaveType.value,
+            hint: Row(
+              children: [
+                Icon(
+                  Icons.category_outlined,
+                  color: AppColors.greyColor,
+                  size: 18,
                 ),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : AppColors.whiteColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isSelected ? AppColors.primary : AppColors.lightGrey,
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
+                const SizedBox(width: 12),
+                Text(
+                  'Select leave type',
+                  style: TextStyle(color: AppColors.greyColor, fontSize: 14),
+                ),
+              ],
+            ),
+            isExpanded: true,
+            icon: Icon(Icons.keyboard_arrow_down, color: AppColors.primary),
+            items: controller.leaveTypes.map((String type) {
+              return DropdownMenuItem<String>(
+                value: type,
+                child: Row(
+                  children: [
+                    Icon(
+                      _getLeaveTypeIcon(type),
+                      color: AppColors.primary,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          type,
+                          style: TextStyle(
+                            color: AppColors.blackColor,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                          ),
+                        ),
+                        // Text(
+                        //   _getLeaveTypeDescription(type),
+                        //   style: TextStyle(
+                        //     color: AppColors.greyColor,
+                        //     fontSize: 11,
+                        //   ),
+                        // ),
+                      ],
                     ),
                   ],
                 ),
-                child: Text(
-                  type,
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.subtitle.copyWith(
-                    color: isSelected ? Colors.white : AppColors.blackColor,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                controller.selectedLeaveType(newValue);
+              }
+            },
+          ),
+        ),
+      );
+    });
   }
 
-  Widget _buildDateSelectors() {
+  String _getLeaveTypeDescription(String type) {
+    switch (type.toLowerCase()) {
+      case 'sick':
+        return 'Medical leave';
+      case 'vacation':
+        return 'Holiday leave';
+      case 'personal':
+        return 'Personal matters';
+      case 'emergency':
+        return 'Urgent situations';
+      case 'maternity':
+        return 'Maternity leave';
+      case 'paternity':
+        return 'Paternity leave';
+      case 'study':
+        return 'Educational leave';
+      default:
+        return '';
+    }
+  }
+
+  IconData _getLeaveTypeIcon(String type) {
+    switch (type.toLowerCase()) {
+      case 'sick':
+        return Icons.healing_rounded;
+      case 'vacation':
+        return Icons.beach_access_rounded;
+      case 'personal':
+        return Icons.person_rounded;
+      case 'emergency':
+        return Icons.warning_rounded;
+      case 'maternity':
+        return Icons.child_friendly_rounded;
+      case 'paternity':
+        return Icons.family_restroom_rounded;
+      case 'study':
+        return Icons.menu_book_rounded;
+      default:
+        return Icons.event_note_rounded;
+    }
+  }
+
+  Widget _buildCompactDateSelectors() {
     return Obx(
       () => Row(
         children: [
           Expanded(
-            child: _buildDateField(
+            child: _buildCompactDateField(
               'From Date',
               controller.fromDate.value,
               () => controller.selectFromDate(Get.context!),
+              Icons.calendar_today_rounded,
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: _buildDateField(
+            child: _buildCompactDateField(
               'To Date',
               controller.toDate.value,
               () => controller.selectToDate(Get.context!),
+              Icons.event_rounded,
             ),
           ),
         ],
@@ -214,41 +332,63 @@ class ApplyLeaveView extends GetView<ApplyLeaveController> {
     );
   }
 
-  Widget _buildDateField(String hint, DateTime? date, VoidCallback onTap) {
+  Widget _buildCompactDateField(
+    String hint,
+    DateTime? date,
+    VoidCallback onTap,
+    IconData icon,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.whiteColor,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.lightGrey),
+          border: Border.all(
+            color: date != null
+                ? AppColors.primary.withOpacity(0.3)
+                : const Color(0xFFE2E8F0),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Text(
-                date != null ? controller.formatDate(date) : hint,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: date != null
-                      ? AppColors.blackColor
-                      : AppColors.greyColor,
-                  fontWeight: FontWeight.w500,
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  color: date != null ? AppColors.primary : AppColors.greyColor,
+                  size: 16,
                 ),
-              ),
+                const SizedBox(width: 6),
+                Text(
+                  hint,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.greyColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
-            Icon(
-              Icons.calendar_today_outlined,
-              color: AppColors.primary,
-              size: 20,
+            const SizedBox(height: 4),
+            Text(
+              date != null ? controller.formatDate(date) : 'Select date',
+              style: TextStyle(
+                fontSize: 13,
+                color: date != null
+                    ? AppColors.blackColor
+                    : AppColors.greyColor,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -256,73 +396,87 @@ class ApplyLeaveView extends GetView<ApplyLeaveController> {
     );
   }
 
-  Widget _buildReasonField() {
+  Widget _buildCompactReasonField() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.whiteColor,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: TextField(
         controller: controller.reasonController,
-        maxLines: 4,
+        maxLines: 3,
         decoration: InputDecoration(
-          hintText: 'Enter your reason here',
-          hintStyle: AppTextStyles.hint,
+          hintText: 'Describe the reason for your leave...',
+          hintStyle: TextStyle(
+            color: AppColors.greyColor.withOpacity(0.7),
+            fontSize: 13,
+          ),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Icon(
+              Icons.edit_outlined,
+              color: AppColors.primary,
+              size: 18,
+            ),
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: AppColors.lightGrey),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: AppColors.lightGrey),
+            borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: AppColors.primary, width: 2),
           ),
           filled: true,
-          fillColor: AppColors.whiteColor,
-          contentPadding: const EdgeInsets.all(16),
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.fromLTRB(12, 16, 12, 16),
         ),
       ),
     );
   }
 
-  Widget _buildDestinationFields() {
-    return Column(
+  Widget _buildCompactTravelFields() {
+    return Row(
       children: [
-        _buildTextField(
-          controller: controller.destinationController,
-          hint: 'Destination',
+        Expanded(
+          child: _buildCompactTextField(
+            controller: controller.destinationController,
+            hint: 'Destination',
+            icon: Icons.location_on_rounded,
+          ),
         ),
-        const SizedBox(height: 16),
-        _buildTextField(
-          controller: controller.travelModeController,
-          hint: 'Mode of Travel',
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildCompactTextField(
+            controller: controller.travelModeController,
+            hint: 'Travel mode',
+            icon: Icons.directions_rounded,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildCompactTextField({
     required TextEditingController controller,
     required String hint,
+    required IconData icon,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.whiteColor,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -331,171 +485,181 @@ class ApplyLeaveView extends GetView<ApplyLeaveController> {
         controller: controller,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: AppTextStyles.hint,
+          hintStyle: TextStyle(
+            color: AppColors.greyColor.withOpacity(0.7),
+            fontSize: 13,
+          ),
+          prefixIcon: Icon(icon, color: AppColors.primary, size: 18),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: AppColors.lightGrey),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: AppColors.lightGrey),
+            borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: AppColors.primary, width: 2),
           ),
           filled: true,
-          fillColor: AppColors.whiteColor,
+          fillColor: Colors.white,
           contentPadding: const EdgeInsets.all(16),
         ),
       ),
     );
   }
 
-  Widget _buildDocumentUpload() {
+  Widget _buildCompactDocumentUpload() {
     return Obx(
       () => Column(
         children: [
-          // Upload Area
           GestureDetector(
             onTap: controller.pickFiles,
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.whiteColor,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppColors.lightGrey,
-                  style: BorderStyle.solid,
-                  width: 2,
-                ),
+                border: Border.all(color: AppColors.primary.withOpacity(0.2)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.image_outlined,
-                        color: AppColors.greyColor,
-                        size: 24,
-                      ),
-                      const SizedBox(width: 8),
-                      Icon(
-                        Icons.description_outlined,
-                        color: AppColors.greyColor,
-                        size: 24,
-                      ),
-                    ],
+                  Icon(
+                    Icons.cloud_upload_outlined,
+                    color: AppColors.primary,
+                    size: 32,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Text(
-                    'Upload images or documents',
+                    'Upload Documents',
                     style: TextStyle(
-                      color: AppColors.greyColor,
+                      color: AppColors.blackColor,
                       fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    child: const Text(
-                      'Choose File',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                  Text(
+                    'Click to browse files',
+                    style: TextStyle(color: AppColors.greyColor, fontSize: 11),
                   ),
                 ],
               ),
             ),
           ),
-
-          // Uploaded Files List
           if (controller.uploadedFileNames.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            ...controller.uploadedFileNames.asMap().entries.map((entry) {
-              int index = entry.key;
-              String fileName = entry.value;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.lightGrey),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.attach_file, color: AppColors.primary, size: 20),
-                    const SizedBox(width: 12),
-                    Expanded(child: Text(fileName, style: AppTextStyles.body)),
-                    GestureDetector(
-                      onTap: () => controller.removeFile(index),
-                      child: Icon(
-                        Icons.close,
-                        color: AppColors.error,
-                        size: 20,
-                      ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Column(
+                children: controller.uploadedFileNames.asMap().entries.map((
+                  entry,
+                ) {
+                  int index = entry.key;
+                  String fileName = entry.value;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.attach_file,
+                          color: AppColors.primary,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            fileName,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.blackColor,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => controller.removeFile(index),
+                          child: Icon(Icons.close, color: Colors.red, size: 16),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
+              ),
+            ),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildSubmitButton() {
+  Widget _buildCompactSubmitButton() {
     return Obx(
-      () => SizedBox(
+      () => Container(
         width: double.infinity,
+        height: 48,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
+          ),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
         child: ElevatedButton(
           onPressed: controller.isLoading.value
               ? null
               : controller.submitApplication,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
+            backgroundColor: Colors.transparent,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            shadowColor: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25),
+              borderRadius: BorderRadius.circular(24),
             ),
-            elevation: 5,
-            shadowColor: AppColors.primary.withOpacity(0.3),
           ),
           child: controller.isLoading.value
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Submitting...', style: TextStyle(fontSize: 14)),
+                  ],
                 )
-              : const Text(
-                  'Submit Application',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.send_rounded, size: 18),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Submit Application',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
         ),
       ),

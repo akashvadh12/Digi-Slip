@@ -58,12 +58,13 @@ class _LoginScreenState extends State<LoginScreen>
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
 
-    _offsetAnimation = Tween<Offset>(
-      begin: Offset(0.0, 1.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
+    _offsetAnimation = Tween<Offset>(begin: Offset(0.0, 1.0), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
 
     // Start animations
     _startAnimations();
@@ -130,11 +131,16 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                             ],
                           ),
-                          child: Image.asset(
-                            'assets/logo/DigiSlips.png',
-                            fit: BoxFit.contain,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25),
+                            child: Image.asset(
+                              'assets/logo/DigiSlips.png', 
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
+
+                       
                       );
                     },
                   ),
@@ -147,13 +153,12 @@ class _LoginScreenState extends State<LoginScreen>
                     child: Column(
                       children: [
                         ShaderMask(
-                          shaderCallback:
-                              (bounds) => LinearGradient(
-                                colors: [
-                                  AppColors.primary,
-                                  AppColors.primary.withOpacity(0.7),
-                                ],
-                              ).createShader(bounds),
+                          shaderCallback: (bounds) => LinearGradient(
+                            colors: [
+                              AppColors.primary,
+                              AppColors.primary.withOpacity(0.7),
+                            ],
+                          ).createShader(bounds),
                           child: Text(
                             'DigiSlips',
                             style: AppTextStyles.brandName?.copyWith(
@@ -212,8 +217,8 @@ class _LoginScreenState extends State<LoginScreen>
                                 child: Align(
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
-                                    onPressed:
-                                        () => _showForgotPasswordDialog(),
+                                    onPressed: () =>
+                                        _showForgotPasswordDialog(),
                                     child: Text(
                                       'Forgot Password?',
                                       style: TextStyle(
@@ -547,34 +552,32 @@ class _LoginScreenState extends State<LoginScreen>
                 color: Colors.transparent,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(15),
-                  onTap:
-                      controller.isLoading.value
-                          ? null
-                          : () {
-                            HapticFeedback.mediumImpact();
-                            controller.login();
-                          },
+                  onTap: controller.isLoading.value
+                      ? null
+                      : () {
+                          HapticFeedback.mediumImpact();
+                          controller.login();
+                        },
                   child: Container(
                     alignment: Alignment.center,
-                    child:
-                        controller.isLoading.value
-                            ? SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2.5,
-                              ),
-                            )
-                            : Text(
-                              'Log In',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5,
-                              ),
+                    child: controller.isLoading.value
+                        ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
                             ),
+                          )
+                        : Text(
+                            'Log In',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
                   ),
                 ),
               ),
@@ -635,45 +638,44 @@ class _LoginScreenState extends State<LoginScreen>
             TextButton(onPressed: () => Get.back(), child: Text('Cancel')),
             Obx(
               () => ElevatedButton(
-                onPressed:
-                    isLoading.value
-                        ? null
-                        : () async {
-                          if (emailController.text.trim().isEmpty) {
-                            Get.snackbar(
-                              'Error',
-                              'Please enter your email address',
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                            );
-                            return;
-                          }
+                onPressed: isLoading.value
+                    ? null
+                    : () async {
+                        if (emailController.text.trim().isEmpty) {
+                          Get.snackbar(
+                            snackPosition: SnackPosition.TOP,
+                            'Error',
+                            'Please enter your email address',
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                          );
+                          return;
+                        }
 
-                          isLoading.value = true;
-                          await controller.forgotPassword();
-                          isLoading.value = false;
-                          Get.back();
-                        },
+                        isLoading.value = true;
+                        await controller.forgotPassword();
+                        isLoading.value = false;
+                        Get.back();
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child:
-                    isLoading.value
-                        ? SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                        : Text(
-                          'Send Reset Link',
-                          style: TextStyle(color: Colors.white),
+                child: isLoading.value
+                    ? SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
                         ),
+                      )
+                    : Text(
+                        'Send Reset Link',
+                        style: TextStyle(color: Colors.white),
+                      ),
               ),
             ),
           ],
