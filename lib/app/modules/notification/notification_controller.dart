@@ -56,6 +56,27 @@ class NotificationModel {
     };
   }
 
+  // Helper method to get icon from code point
+  static IconData _getIconFromCodePoint(int codePoint) {
+    // Map common code points to their constant IconData
+    switch (codePoint) {
+      case 0xe5ca: // check_circle
+        return Icons.check_circle;
+      case 0xe5c9: // cancel
+        return Icons.cancel;
+      case 0xef64: // pending
+        return Icons.pending;
+      case 0xe163: // send
+        return Icons.send;
+      case 0xe7fd: // person
+        return Icons.person;
+      case 0xe88e: // info
+        return Icons.info;
+      default:
+        return Icons.info; // fallback
+    }
+  }
+
   // Create from JSON
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
@@ -70,7 +91,7 @@ class NotificationModel {
       isRead: json['isRead'] ?? false,
       relatedLeaveId: json['relatedLeaveId'],
       backgroundColor: Color(json['backgroundColor']),
-      icon: IconData(json['icon'], fontFamily: 'MaterialIcons'),
+      icon: _getIconFromCodePoint(json['icon']),
     );
   }
 

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.digislips">
+    package="com.rs.student_leave_app">
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.CAMERA"/>
@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
 
     <application
-        android:label="digislips-student"
+        android:label="Student Leave app"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
 

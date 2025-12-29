@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:digislips/app/modules/auth/models/user_model.dart';
-import 'package:firebase_database/firebase_database.dart';
+// Removed Realtime Database import; profile images will be read from Firestore
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:digislips/app/core/theme/app_colors.dart';
 import 'package:digislips/app/core/theme/app_text_styles.dart';
@@ -101,17 +101,9 @@ class ProfileController extends GetxController {
       if (doc.exists && doc.data() != null) {
         Student firestoreStudent = Student.fromMap(doc.data()!);
 
-        final DatabaseReference dbRef = FirebaseDatabase.instance.ref().child(
-          'profile_images/$uid',
-        );
-        final DataSnapshot snapshot = await dbRef.get();
-
-        String? imageUrl;
-        if (snapshot.exists && snapshot.value != null) {
-          imageUrl = snapshot.value.toString();
-        }
-
-        student.value = firestoreStudent.copyWith(profileImageUrl: imageUrl);
+        // Bypass Realtime Database profile image lookup.
+        // Use the profileImageUrl stored in Firestore (if any).
+        student.value = firestoreStudent;
         _populateEditControllers();
       } else {
         throw Exception('Student data not found');

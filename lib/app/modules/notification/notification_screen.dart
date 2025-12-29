@@ -42,30 +42,30 @@ class NotificationScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        // Get.back();
-                        bottomNavController.changeBottomNavIndex(0);
-                      },
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     // Get.back();
+                    //     bottomNavController.changeBottomNavIndex(0);
+                    //   },
       
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
+                    //   child: Container(
+                    //     padding: const EdgeInsets.all(8),
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.white.withOpacity(0.15),
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       border: Border.all(
+                    //         color: Colors.white.withOpacity(0.2),
+                    //         width: 1,
+                    //       ),
+                    //     ),
+                    //     child: const Icon(
+                    //       Icons.arrow_back_ios_new_rounded,
+                    //       color: Colors.white,
+                    //       size: 18,
+                    //     ),
+                    //   ),
+                    // ),
+                    // const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

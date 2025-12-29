@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen>
                             ],
                           ),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(25),
+                            borderRadius: BorderRadius.circular(15),
                             child: Image.asset(
                               'assets/logo/DigiSlips.png', 
                               fit: BoxFit.cover,
@@ -160,9 +160,9 @@ class _LoginScreenState extends State<LoginScreen>
                             ],
                           ).createShader(bounds),
                           child: Text(
-                            'DigiSlips',
+                            'Student Leave ',
                             style: AppTextStyles.brandName?.copyWith(
-                              fontSize: 32,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -172,6 +172,7 @@ class _LoginScreenState extends State<LoginScreen>
                           'Your Digital School Companion',
                           style: AppTextStyles.subtitle?.copyWith(
                             color: Colors.grey[600],
+                            fontSize: 14,
                           ),
                         ),
                       ],
